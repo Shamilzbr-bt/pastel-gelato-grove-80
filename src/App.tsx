@@ -10,6 +10,7 @@ import Product from "./pages/Product";
 import About from "./pages/About";
 import Locations from "./pages/Locations";
 import Shop from "./pages/Shop";
+import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/locations" element={<Locations />} />
             <Route path="/shop" element={<Shop />} />
+            <Route path="/cart" element={<Cart />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

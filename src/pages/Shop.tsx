@@ -1,99 +1,106 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ShoppingBag } from 'lucide-react';
 import { toast } from "sonner";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-}
+import { shopifyService, ShopifyProduct, CartItem } from '@/services/shopify';
 
 export default function Shop() {
-  const [products, setProducts] = useState<Product[]>([
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  
+  // Fetch products from Shopify
+  useEffect(() => {
+    async function fetchProducts() {
+      setIsLoading(true);
+      try {
+        const shopifyProducts = await shopifyService.getProducts();
+        setProducts(shopifyProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        toast.error("Failed to load products. Using demo data instead.");
+        
+        // Fall back to demo products
+        setProducts(getDemoProducts());
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    fetchProducts();
+  }, []);
+  
+  // Extract categories from product tags
+  const categories = Array.from(
+    new Set(
+      products
+        .flatMap(p => p.tags ? p.tags.split(',').map(tag => tag.trim()) : [])
+        .filter(tag => tag)
+    )
+  );
+  
+  const filteredProducts = activeCategory 
+    ? products.filter(product => 
+        product.tags && product.tags.split(',').map(t => t.trim()).includes(activeCategory)
+      ) 
+    : products;
+  
+  const addToCart = (product: ShopifyProduct) => {
+    // Use the first variant by default
+    const variant = product.variants[0];
+    if (!variant) {
+      toast.error("This product is not available for purchase");
+      return;
+    }
+    
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.variantId === variant.id);
+      if (existingItem) {
+        return prevCart.map(item => 
+          item.variantId === variant.id 
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...prevCart, { 
+          variantId: variant.id, 
+          quantity: 1,
+          title: product.title,
+          price: variant.price,
+          image: product.images[0]?.src
+        }];
+      }
+    });
+    
+    toast.success(`${product.title} added to your cart!`);
+  };
+
+  // Dummy function to get demo products if Shopify fetch fails
+  const getDemoProducts = () => [
     {
       id: "gift-card-25",
-      name: "Gelatico Gift Card - $25",
+      title: "Gelatico Gift Card - $25",
       description: "Share the joy of gelato with friends and family. A perfect gift for any occasion.",
-      price: 25,
-      image: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1287&auto=format&fit=crop",
-      category: "Gift Cards"
+      handle: "gift-card-25",
+      images: [{ src: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1287&auto=format&fit=crop" }],
+      variants: [{ id: "gift-card-25-variant", price: "25.00", title: "Default" }],
+      tags: "Gift Cards"
     },
     {
       id: "gift-card-50",
-      name: "Gelatico Gift Card - $50",
+      title: "Gelatico Gift Card - $50",
       description: "Share the joy of gelato with friends and family. A perfect gift for any occasion.",
-      price: 50,
-      image: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1287&auto=format&fit=crop",
-      category: "Gift Cards"
+      handle: "gift-card-50",
+      images: [{ src: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1287&auto=format&fit=crop" }],
+      variants: [{ id: "gift-card-50-variant", price: "50.00", title: "Default" }],
+      tags: "Gift Cards"
     },
-    {
-      id: "gelato-box-8",
-      name: "Gelato Party Box - 8 Flavors",
-      description: "A selection of 8 of our most popular flavors, perfect for gatherings or special occasions.",
-      price: 55.99,
-      image: "https://images.unsplash.com/photo-1579954115563-e72bf1381629?q=80&w=1287&auto=format&fit=crop",
-      category: "Gelato Boxes"
-    },
-    {
-      id: "gelato-box-4",
-      name: "Gelato Sampler Box - 4 Flavors",
-      description: "Try a variety of our signature flavors with this perfect sampler for 2-4 people.",
-      price: 29.99,
-      image: "https://images.unsplash.com/photo-1557142046-c704a3adf364?q=80&w=1287&auto=format&fit=crop",
-      category: "Gelato Boxes"
-    },
-    {
-      id: "ice-cream-scoop",
-      name: "Premium Gelato Scoop",
-      description: "Our ergonomic gelato scoop designed for the perfect serve every time.",
-      price: 12.99,
-      image: "https://images.unsplash.com/photo-1627308595658-1a5632c31eda?q=80&w=1335&auto=format&fit=crop",
-      category: "Accessories"
-    },
-    {
-      id: "waffle-bowl-maker",
-      name: "Waffle Bowl Maker",
-      description: "Create homemade waffle bowls with this easy-to-use maker for an authentic gelato experience.",
-      price: 34.99,
-      image: "https://images.unsplash.com/photo-1516559828984-fb3b99548b21?q=80&w=1170&auto=format&fit=crop",
-      category: "Accessories"
-    },
-    {
-      id: "gelatico-tshirt",
-      name: "Gelatico Logo T-Shirt",
-      description: "Soft, comfortable cotton t-shirt featuring our signature Gelatico logo.",
-      price: 24.99,
-      image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=1064&auto=format&fit=crop",
-      category: "Merchandise"
-    },
-    {
-      id: "gelatico-hat",
-      name: "Gelatico Cap",
-      description: "Stylish adjustable cap with embroidered Gelatico logo.",
-      price: 19.99,
-      image: "https://images.unsplash.com/photo-1521369909029-2afed882baee?q=80&w=1170&auto=format&fit=crop",
-      category: "Merchandise"
-    }
-  ]);
-  
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  
-  const categories = Array.from(new Set(products.map(p => p.category)));
-  
-  const filteredProducts = activeCategory 
-    ? products.filter(product => product.category === activeCategory) 
-    : products;
-  
-  const addToCart = (product: Product) => {
-    toast.success(`${product.name} added to your cart!`);
-  };
+    // ... more demo products as needed
+  ] as ShopifyProduct[];
 
   return (
     <div className="min-h-screen bg-white">
@@ -152,47 +159,77 @@ export default function Shop() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
-          {filteredProducts.map((product) => (
-            <motion.div
-              key={product.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-hover transition-all duration-300"
-            >
-              <div className="aspect-square relative overflow-hidden">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                />
-                <div className="absolute top-3 left-3">
-                  <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/70 backdrop-blur-sm text-gelatico-pink">
-                    {product.category}
-                  </span>
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-soft animate-pulse">
+                <div className="aspect-square bg-gray-200"></div>
+                <div className="p-5">
+                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                  <div className="flex items-center justify-between">
+                    <div className="h-6 w-16 bg-gray-200 rounded"></div>
+                    <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="p-5">
-                <h3 className="text-lg font-bold mb-2">{product.name}</h3>
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                  {product.description}
-                </p>
+            ))
+          ) : filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <motion.div
+                key={product.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-hover transition-all duration-300"
+              >
+                <div className="aspect-square relative overflow-hidden">
+                  <img 
+                    src={product.images[0]?.src || 'https://placehold.co/400'} 
+                    alt={product.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/70 backdrop-blur-sm text-gelatico-pink">
+                      {product.tags?.split(',')[0].trim() || 'Product'}
+                    </span>
+                  </div>
+                </div>
                 
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold">${product.price.toFixed(2)}</span>
-                  <button
-                    onClick={() => addToCart(product)}
-                    className="inline-flex items-center justify-center p-2 rounded-full bg-gelatico-pink text-white hover:bg-gelatico-pink/90 transition-all duration-300"
-                  >
-                    <ShoppingBag size={18} />
-                  </button>
+                <div className="p-5">
+                  <h3 className="text-lg font-bold mb-2">{product.title}</h3>
+                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                    {product.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-semibold">
+                      ${parseFloat(product.variants[0]?.price || '0').toFixed(2)}
+                    </span>
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="inline-flex items-center justify-center p-2 rounded-full bg-gelatico-pink text-white hover:bg-gelatico-pink/90 transition-all duration-300"
+                    >
+                      <ShoppingBag size={18} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <h3 className="text-2xl font-gelatico mb-4">No products found</h3>
+              <p className="text-muted-foreground mb-6">Try adjusting your category filter.</p>
+              <button 
+                onClick={() => setActiveCategory(null)}
+                className="px-4 py-2 rounded-full bg-gelatico-pink text-white hover:bg-gelatico-pink/90 transition-all duration-300"
+              >
+                View All Products
+              </button>
+            </div>
+          )}
         </motion.div>
         
         {/* Gift Cards Highlight */}

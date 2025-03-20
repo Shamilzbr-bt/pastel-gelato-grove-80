@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const location = useLocation();
 
   useEffect(() => {
@@ -26,6 +27,32 @@ export default function Header() {
     // Close mobile menu when route changes
     setIsMenuOpen(false);
   }, [location.pathname]);
+
+  // Get cart count from localStorage
+  useEffect(() => {
+    const getCartCount = () => {
+      try {
+        const cartItems = JSON.parse(localStorage.getItem('gelatico-cart') || '[]');
+        const count = cartItems.reduce((total: number, item: any) => total + item.quantity, 0);
+        setCartCount(count);
+      } catch (error) {
+        console.error('Error getting cart count:', error);
+        setCartCount(0);
+      }
+    };
+
+    getCartCount();
+    
+    // Listen for storage events to update cart count
+    window.addEventListener('storage', getCartCount);
+    // Listen for custom cart update events
+    window.addEventListener('cart-updated', getCartCount);
+    
+    return () => {
+      window.removeEventListener('storage', getCartCount);
+      window.removeEventListener('cart-updated', getCartCount);
+    };
+  }, []);
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -83,7 +110,7 @@ export default function Header() {
           >
             <ShoppingCart size={20} />
             <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-gelatico-pink rounded-full">
-              0
+              {cartCount}
             </span>
           </Link>
         </nav>
@@ -96,7 +123,7 @@ export default function Header() {
           >
             <ShoppingCart size={20} />
             <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-gelatico-pink rounded-full">
-              0
+              {cartCount}
             </span>
           </Link>
           
