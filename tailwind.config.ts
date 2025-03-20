@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Gelatico custom colors
+				gelatico: {
+					pink: '#EC5C9D',
+					'baby-pink': '#FFD1DC',
+					'peach-cream': '#FFF5E1',
+					'soft-blue': '#A7C7E7',
 				}
 			},
 			borderRadius: {
@@ -84,12 +92,103 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0)'
+					},
+					'50%': {
+						transform: 'translateY(-10px)'
+					}
+				},
+				'pulse-soft': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.8'
+					}
+				},
+				'scale-up': {
+					'0%': {
+						transform: 'scale(1)'
+					},
+					'100%': {
+						transform: 'scale(1.05)'
+					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'slide-up': {
+					'0%': {
+						transform: 'translateY(100%)'
+					},
+					'100%': {
+						transform: 'translateY(0)'
+					}
+				},
+				'slide-down': {
+					'0%': {
+						transform: 'translateY(-100%)'
+					},
+					'100%': {
+						transform: 'translateY(0)'
+					}
+				},
+				'slide-in-right': {
+					'0%': {
+						transform: 'translateX(100%)'
+					},
+					'100%': {
+						transform: 'translateX(0)'
+					}
+				},
+				'rotate-slow': {
+					'0%': {
+						transform: 'rotate(0deg)'
+					},
+					'100%': {
+						transform: 'rotate(360deg)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
+				'scale-up': 'scale-up 0.3s ease-out forwards',
+				'fade-in': 'fade-in 0.6s ease-out',
+				'slide-up': 'slide-up 0.6s ease-out',
+				'slide-down': 'slide-down 0.6s ease-out',
+				'slide-in-right': 'slide-in-right 0.6s ease-out',
+				'rotate-slow': 'rotate-slow 12s linear infinite'
+			},
+			fontFamily: {
+				'gelatico': ['Playfair Display', 'serif'],
+				'gelatico-body': ['Poppins', 'sans-serif']
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'hero-pattern': 'linear-gradient(to right bottom, rgba(255, 209, 220, 0.8), rgba(167, 199, 231, 0.8))',
+				'card-gradient': 'linear-gradient(to right bottom, rgba(255, 245, 225, 0.95), rgba(255, 209, 220, 0.95))',
+			},
+			boxShadow: {
+				'soft': '0 5px 30px -15px rgba(0, 0, 0, 0.15)',
+				'hover': '0 10px 40px -15px rgba(0, 0, 0, 0.25)',
+				'button': '0 5px 15px -3px rgba(236, 92, 157, 0.2)',
+			},
+			backdropFilter: {
+				'glass': 'blur(10px) saturate(180%)',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
