@@ -52,7 +52,7 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
           
           <div className="flex items-center gap-4">
             <span className="font-semibold">
-              ${item.price ? (parseFloat(item.price) * item.quantity).toFixed(2) : '0.00'}
+              {item.price ? (parseFloat(item.price) * item.quantity).toFixed(3) : '0.000'} KD
             </span>
             <button
               onClick={() => removeItem(item.variantId)}

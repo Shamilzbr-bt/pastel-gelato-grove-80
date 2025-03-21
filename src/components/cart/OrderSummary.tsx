@@ -26,7 +26,7 @@ export default function OrderSummary({
       <div className="space-y-4 mb-6">
         <div className="flex justify-between">
           <span className="text-muted-foreground">Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>{subtotal.toFixed(3)} KD</span>
         </div>
         
         <div className="flex justify-between">
@@ -34,20 +34,20 @@ export default function OrderSummary({
           <span>
             {shippingFee === 0 
               ? <span className="text-green-600">Free</span> 
-              : `$${shippingFee.toFixed(2)}`
+              : `${shippingFee.toFixed(3)} KD`
             }
           </span>
         </div>
         
         {shippingFee > 0 && (
           <div className="text-sm text-muted-foreground">
-            Free shipping on orders over $50
+            Free shipping on orders over 15 KD
           </div>
         )}
         
         <div className="border-t border-muted pt-4 flex justify-between font-semibold">
           <span>Total</span>
-          <span>${total.toFixed(2)}</span>
+          <span>{total.toFixed(3)} KD</span>
         </div>
       </div>
       

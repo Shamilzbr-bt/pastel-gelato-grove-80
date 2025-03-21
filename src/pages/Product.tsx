@@ -9,13 +9,23 @@ import { Button } from "@/components/ui/button";
 import { Flavor } from '@/components/FlavorCard';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import ToppingsSelector from '@/components/product/ToppingsSelector';
+import ContainerSelector, { ContainerOption } from '@/components/product/ContainerSelector';
+
+interface Topping {
+  id: string;
+  name: string;
+  price: number;
+  category: 'addons' | 'sauces';
+}
 
 export default function Product() {
   const { id } = useParams<{ id: string }>();
   const [flavor, setFlavor] = useState<Flavor | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedSize, setSelectedSize] = useState('regular');
+  const [selectedContainer, setSelectedContainer] = useState('cup-minio');
+  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
   
   // Mock getting flavor data
   useEffect(() => {
@@ -28,7 +38,7 @@ export default function Product() {
         name: "Strawberry Dream",
         description: "Creamy gelato bursting with real strawberry pieces and a hint of vanilla. Each scoop brings you the taste of fresh summer strawberries, picked at the peak of ripeness and blended into our signature gelato base.",
         image: "https://images.unsplash.com/photo-1557142046-c704a3adf364?q=80&w=687&auto=format&fit=crop",
-        price: 4.99,
+        price: 1.900,
         tags: ["Classic", "Seasonal"],
         ingredients: ["Milk", "Cream", "Sugar", "Strawberries", "Vanilla extract"],
         nutritionalInfo: {
@@ -53,9 +63,53 @@ export default function Product() {
     }
   };
 
+  const handleToppingsChange = (toppings: Topping[]) => {
+    setSelectedToppings(toppings);
+  };
+
+  // Calculate total price
+  const calculateTotalPrice = () => {
+    if (!flavor) return 0;
+    
+    // Container price
+    const containerOptions: ContainerOption[] = [
+      { id: 'cup-minio', type: 'cup', size: 'minio', name: 'Minio Cup', price: 1.900, description: 'Single scoop cup' },
+      { id: 'cup-medio', type: 'cup', size: 'medio', name: 'Medio Cup', price: 2.900, description: 'Double scoop cup' },
+      { id: 'cup-megano', type: 'cup', size: 'megano', name: 'Megano Cup', price: 3.900, description: 'Triple scoop cup' },
+      { id: 'cone-standard', type: 'cone', size: 'standard', name: 'Standard Cone', price: 1.900, description: 'Single scoop cone' },
+      { id: 'cone-tower', type: 'cone', size: 'tower', name: 'Tower Cone', price: 2.900, description: 'Double scoop cone' },
+    ];
+    
+    const selectedOption = containerOptions.find(option => option.id === selectedContainer);
+    const containerPrice = selectedOption?.price || flavor.price;
+    
+    // Toppings price
+    const toppingsPriceTotal = selectedToppings.reduce((sum, topping) => sum + topping.price, 0);
+    
+    // Total for one item
+    const singleItemPrice = containerPrice + toppingsPriceTotal;
+    
+    // Multiply by quantity
+    return singleItemPrice * quantity;
+  };
+
   const handleAddToCart = () => {
     if (flavor) {
-      toast.success(`${quantity} ${quantity > 1 ? 'scoops' : 'scoop'} of ${flavor.name} added to your cart!`);
+      const toppingsText = selectedToppings.length > 0 
+        ? ` with ${selectedToppings.map(t => t.name).join(', ')}` 
+        : '';
+      
+      const containerOptions: ContainerOption[] = [
+        { id: 'cup-minio', type: 'cup', size: 'minio', name: 'Minio Cup', price: 1.900, description: 'Single scoop cup' },
+        { id: 'cup-medio', type: 'cup', size: 'medio', name: 'Medio Cup', price: 2.900, description: 'Double scoop cup' },
+        { id: 'cup-megano', type: 'cup', size: 'megano', name: 'Megano Cup', price: 3.900, description: 'Triple scoop cup' },
+        { id: 'cone-standard', type: 'cone', size: 'standard', name: 'Standard Cone', price: 1.900, description: 'Single scoop cone' },
+        { id: 'cone-tower', type: 'cone', size: 'tower', name: 'Tower Cone', price: 2.900, description: 'Double scoop cone' },
+      ];
+      
+      const selectedOption = containerOptions.find(option => option.id === selectedContainer);
+      
+      toast.success(`${quantity} ${selectedOption?.name || ''} of ${flavor.name}${toppingsText} added to your cart!`);
     }
   };
   
@@ -68,13 +122,6 @@ export default function Product() {
     if (tagLower === 'seasonal') return 'flavor-tag-seasonal';
     return 'bg-gray-100 text-gray-800';
   };
-
-  // Size options for the product
-  const sizeOptions = [
-    { id: 'small', name: 'Small', price: flavor?.price ? flavor.price - 1 : 3.99 },
-    { id: 'regular', name: 'Regular', price: flavor?.price || 4.99 },
-    { id: 'large', name: 'Large', price: flavor?.price ? flavor.price + 2 : 6.99 },
-  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -135,25 +182,18 @@ export default function Product() {
                 {flavor.description}
               </p>
               
-              {/* Size Selection */}
+              {/* Container Selection */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Size</h3>
-                <div className="flex space-x-4">
-                  {sizeOptions.map((size) => (
-                    <button
-                      key={size.id}
-                      className={cn(
-                        "px-4 py-2 rounded-full border-2 transition-all duration-300",
-                        selectedSize === size.id
-                          ? "border-gelatico-pink bg-gelatico-baby-pink/20 text-gelatico-pink"
-                          : "border-muted-foreground/30 hover:border-gelatico-pink"
-                      )}
-                      onClick={() => setSelectedSize(size.id)}
-                    >
-                      {size.name} - ${size.price.toFixed(2)}
-                    </button>
-                  ))}
-                </div>
+                <h3 className="text-lg font-semibold mb-3">Choose Your Container</h3>
+                <ContainerSelector
+                  selectedContainer={selectedContainer}
+                  setSelectedContainer={setSelectedContainer}
+                />
+              </div>
+              
+              {/* Toppings Selection */}
+              <div className="mb-6">
+                <ToppingsSelector onSelectToppings={handleToppingsChange} maxSelections={3} />
               </div>
               
               {/* Ingredients */}
@@ -199,34 +239,41 @@ export default function Product() {
                 </div>
               )}
               
-              {/* Add to Cart Section */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <div className="flex items-center border border-muted-foreground/30 rounded-full overflow-hidden">
-                  <button
-                    onClick={() => handleQuantityChange('decrease')}
-                    className="px-4 py-2 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
-                    disabled={quantity <= 1}
-                  >
-                    <Minus size={16} />
-                  </button>
-                  
-                  <span className="w-10 text-center">{quantity}</span>
-                  
-                  <button
-                    onClick={() => handleQuantityChange('increase')}
-                    className="px-4 py-2 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
-                  >
-                    <Plus size={16} />
-                  </button>
+              {/* Price and Add to Cart Section */}
+              <div className="mt-8 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold">Total</h3>
+                  <span className="text-xl font-bold">{calculateTotalPrice().toFixed(3)} KD</span>
                 </div>
                 
-                <Button 
-                  onClick={handleAddToCart}
-                  className="gelatico-button flex-1 sm:flex-none"
-                >
-                  <ShoppingBag className="mr-2" size={18} />
-                  Add to Cart
-                </Button>
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center border border-muted-foreground/30 rounded-full overflow-hidden">
+                    <button
+                      onClick={() => handleQuantityChange('decrease')}
+                      className="px-4 py-2 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
+                      disabled={quantity <= 1}
+                    >
+                      <Minus size={16} />
+                    </button>
+                    
+                    <span className="w-10 text-center">{quantity}</span>
+                    
+                    <button
+                      onClick={() => handleQuantityChange('increase')}
+                      className="px-4 py-2 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
+                    >
+                      <Plus size={16} />
+                    </button>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleAddToCart}
+                    className="gelatico-button flex-1 sm:flex-none"
+                  >
+                    <ShoppingBag className="mr-2" size={18} />
+                    Add to Cart
+                  </Button>
+                </div>
               </div>
             </motion.div>
           </div>

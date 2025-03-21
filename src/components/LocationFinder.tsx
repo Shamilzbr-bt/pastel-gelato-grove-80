@@ -19,33 +19,73 @@ export default function LocationFinder() {
   const [locations, setLocations] = useState<Location[]>([
     {
       id: 1,
-      name: 'Gelatico Downtown',
-      address: '123 Sweet Street',
-      city: 'New York, NY 10001',
-      phone: '+1 (212) 555-0123',
-      hours: 'Mon-Sun: 11am - 10pm',
+      name: 'Boulevard Mall',
+      address: 'Boulevard Mall',
+      city: 'Salmiya, Kuwait',
+      phone: '+965 5555-5555',
+      hours: 'Mon-Sun: 10am - 10pm',
       image: 'https://images.unsplash.com/photo-1631651738795-b89313168669?q=80&w=1287&auto=format&fit=crop',
-      mapUrl: 'https://maps.google.com'
+      mapUrl: 'https://maps.app.goo.gl/u4fMJ32aN3y8oin1A'
     },
     {
       id: 2,
-      name: 'Gelatico Beachside',
-      address: '456 Ocean Avenue',
-      city: 'Miami, FL 33139',
-      phone: '+1 (305) 555-0456',
-      hours: 'Mon-Sun: 10am - 11pm',
+      name: 'AlKout Mall',
+      address: 'AlKout Mall',
+      city: 'Fahaheel, Kuwait',
+      phone: '+965 5555-5555',
+      hours: 'Mon-Sun: 10am - 10pm',
       image: 'https://images.unsplash.com/photo-1532704868953-d5f3aae5b98a?q=80&w=1287&auto=format&fit=crop',
-      mapUrl: 'https://maps.google.com'
+      mapUrl: 'https://maps.app.goo.gl/W9gG28bFzkXSstzF8'
     },
     {
       id: 3,
-      name: 'Gelatico Hills',
-      address: '789 Highland Road',
-      city: 'Los Angeles, CA 90210',
-      phone: '+1 (323) 555-0789',
-      hours: 'Mon-Sun: 11am - 9pm',
+      name: 'Dome Mall',
+      address: 'Dome Mall',
+      city: 'Abu Halifa, Kuwait',
+      phone: '+965 5555-5555',
+      hours: 'Mon-Sun: 10am - 10pm',
       image: 'https://images.unsplash.com/photo-1631651740656-5c479a041f39?q=80&w=1287&auto=format&fit=crop',
-      mapUrl: 'https://maps.google.com'
+      mapUrl: 'https://maps.app.goo.gl/yBnCh7tJ8k5C6ic87'
+    },
+    {
+      id: 4,
+      name: 'Khiran Mall',
+      address: 'Khiran Mall',
+      city: 'Al Khiran, Kuwait',
+      phone: '+965 5555-5555',
+      hours: 'Mon-Sun: 10am - 10pm',
+      image: 'https://images.unsplash.com/photo-1631651738795-b89313168669?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/jT6kSncwRou2pR629'
+    },
+    {
+      id: 5,
+      name: 'Sama Mall',
+      address: 'Sama Mall',
+      city: 'Ahmadi, Kuwait',
+      phone: '+965 5555-5555',
+      hours: 'Mon-Sun: 10am - 10pm',
+      image: 'https://images.unsplash.com/photo-1532704868953-d5f3aae5b98a?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/ck4CC5BBEowQzpK86'
+    },
+    {
+      id: 6,
+      name: 'Sulaiyal Mall',
+      address: 'Sulaiyal Mall',
+      city: 'Jahra, Kuwait',
+      phone: '+965 5555-5555',
+      hours: 'Mon-Sun: 10am - 10pm',
+      image: 'https://images.unsplash.com/photo-1631651740656-5c479a041f39?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/idKXxVU3XmneZ2Z18'
+    },
+    {
+      id: 7,
+      name: 'Homz Mall',
+      address: 'Homz Mall',
+      city: 'Dajeej, Kuwait',
+      phone: '+965 5555-5555',
+      hours: 'Mon-Sun: 10am - 10pm',
+      image: 'https://images.unsplash.com/photo-1631651738795-b89313168669?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/eGnn2AYzRbC9qrFB6'
     }
   ]);
 
@@ -60,14 +100,14 @@ export default function LocationFinder() {
             Visit Our Stores
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Experience Gelatico in person at one of our beautiful locations. Each store offers 
-            the full range of our signature flavors, along with special local creations.
+            Experience Gelatico in person at one of our beautiful locations throughout Kuwait.
+            Each store offers the full range of our signature flavors, along with special local creations.
           </p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Location Selector */}
-          <div className="lg:col-span-1 space-y-4">
+          <div className="lg:col-span-1 space-y-4 h-[500px] overflow-y-auto pr-2">
             {locations.map((location, index) => (
               <motion.div
                 key={location.id}
@@ -83,7 +123,7 @@ export default function LocationFinder() {
                 <div className="flex items-start space-x-2">
                   <MapPin size={18} className="text-gelatico-pink mt-0.5 flex-shrink-0" />
                   <p className="text-muted-foreground">
-                    {location.address}, {location.city}
+                    {location.city}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2 mt-2">
@@ -106,7 +146,7 @@ export default function LocationFinder() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="rounded-3xl overflow-hidden shadow-soft h-[400px] relative"
+              className="rounded-3xl overflow-hidden shadow-soft h-[500px] relative"
             >
               <img 
                 src={locations[activeLocation].image} 
@@ -121,7 +161,7 @@ export default function LocationFinder() {
                         {locations[activeLocation].name}
                       </h3>
                       <p className="text-white/80">
-                        {locations[activeLocation].address}, {locations[activeLocation].city}
+                        {locations[activeLocation].city}
                       </p>
                     </div>
                     <a 

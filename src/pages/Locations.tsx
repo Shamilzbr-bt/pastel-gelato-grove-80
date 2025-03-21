@@ -23,39 +23,87 @@ export default function Locations() {
   const [locations, setLocations] = useState<Location[]>([
     {
       id: 1,
-      name: 'Gelatico Downtown',
-      address: '123 Sweet Street',
-      city: 'New York, NY 10001',
-      phone: '+1 (212) 555-0123',
-      email: 'downtown@gelatico.com',
-      hours: 'Mon-Fri: 11am - 10pm\nSat-Sun: 10am - 11pm',
-      description: 'Our flagship store located in the heart of downtown, featuring our full range of gelato flavors and a cozy seating area perfect for enjoying your treat.',
+      name: 'Boulevard Mall',
+      address: 'Boulevard Mall',
+      city: 'Salmiya, Kuwait',
+      phone: '+965 5555-5555',
+      email: 'boulevard@gelatico.com',
+      hours: 'Mon-Sun: 10am - 10pm',
+      description: 'Our flagship store located in Boulevard Mall, Salmiya, featuring our full range of gelato flavors and a cozy seating area perfect for enjoying your treat.',
       image: 'https://images.unsplash.com/photo-1631651738795-b89313168669?q=80&w=1287&auto=format&fit=crop',
-      mapUrl: 'https://maps.google.com'
+      mapUrl: 'https://maps.app.goo.gl/u4fMJ32aN3y8oin1A'
     },
     {
       id: 2,
-      name: 'Gelatico Beachside',
-      address: '456 Ocean Avenue',
-      city: 'Miami, FL 33139',
-      phone: '+1 (305) 555-0456',
-      email: 'beachside@gelatico.com',
-      hours: 'Mon-Sun: 10am - 11pm',
-      description: 'Our beachfront location offers refreshing gelato and sorbet flavors perfect for hot days, with outdoor seating overlooking the ocean.',
+      name: 'AlKout Mall',
+      address: 'AlKout Mall',
+      city: 'Fahaheel, Kuwait',
+      phone: '+965 5555-5555',
+      email: 'alkout@gelatico.com',
+      hours: 'Mon-Sun: 10am - 10pm',
+      description: 'Located in the popular AlKout Mall in Fahaheel, this location offers a perfect spot to cool down with our delicious gelato after shopping.',
       image: 'https://images.unsplash.com/photo-1532704868953-d5f3aae5b98a?q=80&w=1287&auto=format&fit=crop',
-      mapUrl: 'https://maps.google.com'
+      mapUrl: 'https://maps.app.goo.gl/W9gG28bFzkXSstzF8'
     },
     {
       id: 3,
-      name: 'Gelatico Hills',
-      address: '789 Highland Road',
-      city: 'Los Angeles, CA 90210',
-      phone: '+1 (323) 555-0789',
-      email: 'hills@gelatico.com',
-      hours: 'Mon-Sun: 11am - 9pm',
-      description: 'Nestled in the hills, this location features exclusive flavors inspired by California\'s fresh produce and a beautiful garden patio.',
+      name: 'Dome Mall',
+      address: 'Dome Mall',
+      city: 'Abu Halifa, Kuwait',
+      phone: '+965 5555-5555',
+      email: 'dome@gelatico.com',
+      hours: 'Mon-Sun: 10am - 10pm',
+      description: 'Our Dome Mall location in Abu Halifa features exclusive flavors and a beautiful interior design for a perfect gelato experience.',
       image: 'https://images.unsplash.com/photo-1631651740656-5c479a041f39?q=80&w=1287&auto=format&fit=crop',
-      mapUrl: 'https://maps.google.com'
+      mapUrl: 'https://maps.app.goo.gl/yBnCh7tJ8k5C6ic87'
+    },
+    {
+      id: 4,
+      name: 'Khiran Mall',
+      address: 'Khiran Mall',
+      city: 'Al Khiran, Kuwait',
+      phone: '+965 5555-5555',
+      email: 'khiran@gelatico.com',
+      hours: 'Mon-Sun: 10am - 10pm',
+      description: 'Visit our Khiran Mall location for refreshing gelato and sorbet flavors perfect for hot days.',
+      image: 'https://images.unsplash.com/photo-1631651738795-b89313168669?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/jT6kSncwRou2pR629'
+    },
+    {
+      id: 5,
+      name: 'Sama Mall',
+      address: 'Sama Mall',
+      city: 'Ahmadi, Kuwait',
+      phone: '+965 5555-5555',
+      email: 'sama@gelatico.com',
+      hours: 'Mon-Sun: 10am - 10pm',
+      description: 'Our Sama Mall location in Ahmadi offers a wide variety of our signature flavors in a welcoming environment.',
+      image: 'https://images.unsplash.com/photo-1532704868953-d5f3aae5b98a?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/ck4CC5BBEowQzpK86'
+    },
+    {
+      id: 6,
+      name: 'Sulaiyal Mall',
+      address: 'Sulaiyal Mall',
+      city: 'Jahra, Kuwait',
+      phone: '+965 5555-5555',
+      email: 'sulaiyal@gelatico.com',
+      hours: 'Mon-Sun: 10am - 10pm',
+      description: 'Experience our artisanal gelato at Sulaiyal Mall in Jahra, with comfortable seating and a friendly atmosphere.',
+      image: 'https://images.unsplash.com/photo-1631651740656-5c479a041f39?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/idKXxVU3XmneZ2Z18'
+    },
+    {
+      id: 7,
+      name: 'Homz Mall',
+      address: 'Homz Mall',
+      city: 'Dajeej, Kuwait',
+      phone: '+965 5555-5555',
+      email: 'homz@gelatico.com',
+      hours: 'Mon-Sun: 10am - 10pm',
+      description: 'Our newest location at Homz Mall in Dajeej, featuring all your favorite gelato flavors and our signature service.',
+      image: 'https://images.unsplash.com/photo-1631651738795-b89313168669?q=80&w=1287&auto=format&fit=crop',
+      mapUrl: 'https://maps.app.goo.gl/eGnn2AYzRbC9qrFB6'
     }
   ]);
 
@@ -77,11 +125,11 @@ export default function Locations() {
             Our Locations
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Find a Gelatico near you and experience our artisanal gelato in person. Each location offers our signature flavors along with special local creations.
+            Find a Gelatico near you across Kuwait and experience our artisanal gelato in person. Each location offers our signature flavors along with special local creations.
           </p>
         </motion.div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {locations.map((location, index) => (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -144,40 +192,6 @@ export default function Locations() {
             </motion.div>
           ))}
         </div>
-        
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="py-16 bg-gelatico-peach-cream/30 rounded-3xl"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold font-gelatico mb-4">
-              Coming Soon
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              We're expanding! Keep an eye out for these new Gelatico locations opening in the near future.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto px-4">
-            <div className="bg-white rounded-2xl p-6 shadow-soft">
-              <h3 className="text-xl font-bold font-gelatico mb-3">Gelatico San Francisco</h3>
-              <p className="text-muted-foreground mb-4">
-                Our first Bay Area location, featuring a special menu of flavors inspired by local California produce.
-              </p>
-              <p className="text-sm text-gelatico-pink">Opening Summer 2023</p>
-            </div>
-            
-            <div className="bg-white rounded-2xl p-6 shadow-soft">
-              <h3 className="text-xl font-bold font-gelatico mb-3">Gelatico Chicago</h3>
-              <p className="text-muted-foreground mb-4">
-                Bringing our authentic gelato to the Windy City, with a cozy indoor space perfect for all seasons.
-              </p>
-              <p className="text-sm text-gelatico-pink">Opening Fall 2023</p>
-            </div>
-          </div>
-        </motion.section>
         
         <motion.section
           initial={{ opacity: 0 }}

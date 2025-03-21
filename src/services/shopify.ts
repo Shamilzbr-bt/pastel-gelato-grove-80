@@ -21,6 +21,7 @@ export interface CartItem {
   title?: string;
   price?: string;
   image?: string;
+  variantTitle?: string;
 }
 
 export interface CheckoutAddress {
