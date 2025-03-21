@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import FlavorCard, { Flavor } from './FlavorCard';
+import FlavorCard from './FlavorCard';
+import { Flavor } from '@/models/Flavor';
 import { Search, Filter } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { 
   DropdownMenu,
   DropdownMenuContent,
