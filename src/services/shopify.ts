@@ -23,6 +23,23 @@ export interface CartItem {
   image?: string;
 }
 
+export interface CheckoutAddress {
+  first_name?: string;
+  last_name?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  province?: string;
+  country?: string;
+  zip?: string;
+  phone?: string;
+}
+
+export interface CheckoutOptions {
+  email?: string;
+  address?: CheckoutAddress;
+}
+
 export const shopifyService = {
   /**
    * Get all products from Shopify
@@ -59,19 +76,46 @@ export const shopifyService = {
   },
 
   /**
-   * Create a checkout with the provided items
+   * Create a checkout with the provided items and optional customer information
    */
-  async createCheckout(items: CartItem[]) {
+  async createCheckout(items: CartItem[], options: CheckoutOptions = {}) {
     try {
+      if (!items.length) {
+        throw new Error('Cannot create checkout with empty cart');
+      }
+
       const { data, error } = await supabase.functions.invoke('shopify', {
-        body: { action: 'createCheckout', data: { items } }
+        body: { 
+          action: 'createCheckout', 
+          data: { 
+            items,
+            email: options.email,
+            address: options.address
+          } 
+        }
       });
 
       if (error) throw error;
-      return data;
+      
+      // Return checkout URL if available
+      if (data.checkout_url) {
+        return {
+          success: true,
+          checkoutUrl: data.checkout_url,
+          checkout: data.checkout
+        };
+      }
+      
+      return {
+        success: true,
+        checkout: data.checkout
+      };
     } catch (error) {
       console.error('Error creating Shopify checkout:', error);
-      throw error;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
     }
   }
 };

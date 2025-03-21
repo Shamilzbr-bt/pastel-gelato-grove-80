@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
@@ -12,6 +11,7 @@ export default function Cart() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const navigate = useNavigate();
   
   // Load cart from localStorage
   useEffect(() => {
@@ -77,13 +77,24 @@ export default function Cart() {
     setIsCheckingOut(true);
     
     try {
-      const checkout = await shopifyService.createCheckout(cartItems);
+      const response = await shopifyService.createCheckout(cartItems);
       
-      // In a real implementation, you would redirect to the Shopify checkout URL
-      // For this demo, we'll just clear the cart and show a success message
-      toast.success("Order placed successfully!");
-      setCartItems([]);
-      
+      if (response.success && response.checkoutUrl) {
+        // For a real implementation, redirect to the Shopify checkout URL
+        toast.success("Redirecting to checkout...");
+        
+        // In a production app, you'd redirect to the checkout URL:
+        // window.location.href = response.checkoutUrl;
+        
+        // For this demo, we'll just clear the cart and show a success message
+        setTimeout(() => {
+          setCartItems([]);
+          toast.success("Order placed successfully!");
+          navigate('/shop');
+        }, 1500);
+      } else if (!response.success) {
+        toast.error(response.error || "There was a problem processing your order");
+      }
     } catch (error) {
       console.error('Error creating checkout:', error);
       toast.error("There was a problem processing your order. Please try again.");

@@ -39,6 +39,13 @@ serve(async (req) => {
           method: 'GET',
           headers,
         });
+        
+        if (!productsResponse.ok) {
+          const errorData = await productsResponse.text();
+          console.error('Shopify products error:', errorData);
+          throw new Error(`Failed to fetch products: ${productsResponse.status}`);
+        }
+        
         result = await productsResponse.json();
         break;
 
@@ -48,25 +55,50 @@ serve(async (req) => {
           method: 'GET',
           headers,
         });
+        
+        if (!productResponse.ok) {
+          const errorData = await productResponse.text();
+          console.error('Shopify product error:', errorData);
+          throw new Error(`Failed to fetch product: ${productResponse.status}`);
+        }
+        
         result = await productResponse.json();
         break;
 
       case 'createCheckout':
         const { items } = data;
-        // Create a draft order that will serve as our "checkout"
-        const checkoutResponse = await fetch(`${baseUrl}/draft_orders.json`, {
+        
+        // Create a checkout instead of a draft order for better user experience
+        const checkoutResponse = await fetch(`${baseUrl}/checkouts.json`, {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            draft_order: {
+            checkout: {
               line_items: items.map(item => ({
                 variant_id: item.variantId,
                 quantity: item.quantity
-              }))
+              })),
+              email: data.email || '',
+              shipping_address: data.address || {}
             }
           })
         });
-        result = await checkoutResponse.json();
+        
+        if (!checkoutResponse.ok) {
+          const errorData = await checkoutResponse.text();
+          console.error('Shopify checkout error:', errorData);
+          throw new Error(`Failed to create checkout: ${checkoutResponse.status}`);
+        }
+        
+        // Get the checkout data
+        const checkoutData = await checkoutResponse.json();
+        
+        // Generate the checkout web URL
+        if (checkoutData.checkout && checkoutData.checkout.token) {
+          checkoutData.checkout_url = `https://${SHOPIFY_STORE_URL}/checkout/${checkoutData.checkout.token}`;
+        }
+        
+        result = checkoutData;
         break;
 
       default:
