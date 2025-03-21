@@ -5,6 +5,7 @@ interface NutritionalInfoProps {
     fat: number;
     carbs: number;
     protein: number;
+    sugar?: number;
   };
 }
 

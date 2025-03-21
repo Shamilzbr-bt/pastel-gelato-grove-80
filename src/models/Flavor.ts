@@ -22,7 +22,13 @@ export interface Flavor {
   }[];
   ingredients?: string[];
   pairings?: string[];
-  nutritionalInfo?: string;
+  nutritionalInfo?: {
+    calories: number;
+    fat: number;
+    carbs: number;
+    protein: number;
+    sugar?: number;
+  };
 }
 
 // Helper to check if a flavor is a sorbet

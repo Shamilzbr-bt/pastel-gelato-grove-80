@@ -10,9 +10,10 @@ import { Flavor } from '@/models/Flavor';
 import { isSorbet } from '@/models/Flavor';
 import { toast } from "sonner";
 
-interface ProductPageParams {
+type ProductPageParams = {
   id: string;
-}
+  [key: string]: string;
+};
 
 export default function Product() {
   const [selectedContainer, setSelectedContainer] = useState('cup');
@@ -22,7 +23,6 @@ export default function Product() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Mocked flavor data for demonstration
     const mockedFlavors: Flavor[] = [
       {
         id: "coconutty",
@@ -245,7 +245,6 @@ export default function Product() {
       return;
     }
 
-    // Basic cart logic - can be expanded
     toast.success(`${flavor.name} added to cart with ${selectedContainer} and toppings: ${selectedToppings.join(', ')}`);
   };
 
@@ -299,15 +298,15 @@ export default function Product() {
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-2">Customize Your Order</h3>
               <ContainerSelector 
-                selectedContainer={selectedContainer}
-                onContainerChange={setSelectedContainer}
+                selected={selectedContainer}
+                onSelect={setSelectedContainer}
               />
             </div>
 
             <div className="mb-6">
               <ToppingsSelector 
-                selectedToppings={selectedToppings}
-                onToppingsChange={setSelectedToppings}
+                selected={selectedToppings}
+                onSelectToppings={setSelectedToppings}
               />
             </div>
 
