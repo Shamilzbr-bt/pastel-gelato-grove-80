@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Twitter, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Facebook, Send, Mail, MapPin, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -15,29 +15,60 @@ export default function Footer() {
               </h1>
             </Link>
             <p className="text-muted-foreground mb-6">
-              Artisanal gelato crafted with passion, bringing a taste of Italy to your neighborhood.
+              Artisanal gelato crafted with passion, bringing a taste of Italy to Kuwait.
             </p>
             <div className="flex space-x-4">
               <a 
-                href="#" 
+                href="https://www.instagram.com/gelatico.kw" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
                 aria-label="Instagram"
               >
                 <Instagram size={18} />
               </a>
               <a 
-                href="#" 
+                href="https://www.facebook.com/gelatico.kw" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
                 aria-label="Facebook"
               >
                 <Facebook size={18} />
               </a>
               <a 
-                href="#" 
+                href="https://www.tiktok.com/@gelatico.kw" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
-                aria-label="Twitter"
+                aria-label="TikTok"
               >
-                <Twitter size={18} />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide-icon"
+                >
+                  <path d="M9 12a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+                  <path d="M15 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+                  <path d="M15 8v8a4 4 0 0 1-4 4"/>
+                  <line x1="15" x2="15" y1="6" y2="16"/>
+                </svg>
+              </a>
+              <a 
+                href="https://t.snapchat.com/M4lIDwbs" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
+                aria-label="Snapchat"
+              >
+                <Send size={18} />
               </a>
             </div>
           </div>
@@ -71,20 +102,20 @@ export default function Footer() {
               <div className="flex items-start space-x-3">
                 <MapPin size={20} className="text-gelatico-pink flex-shrink-0 mt-1" />
                 <p className="text-muted-foreground">
-                  123 Sweet Street<br />
-                  New York, NY 10001
+                  Boulevard Mall, Salmiya<br />
+                  Kuwait
                 </p>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone size={20} className="text-gelatico-pink flex-shrink-0" />
                 <p className="text-muted-foreground">
-                  +1 (212) 555-0123
+                  +965 2221 1234
                 </p>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={20} className="text-gelatico-pink flex-shrink-0" />
                 <p className="text-muted-foreground">
-                  hello@gelatico.com
+                  hello@gelatico.kw
                 </p>
               </div>
             </div>
