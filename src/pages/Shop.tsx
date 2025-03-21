@@ -10,46 +10,89 @@ import { shopifyService, ShopifyProduct, CartItem } from '@/services/shopify';
 // Define gelato flavors using the uploaded images
 const flavorImages = [
   {
-    id: "cookies-cream",
-    title: "Cookies & Cream",
-    image: "/public/lovable-uploads/87089c2c-b9dc-4fd2-8479-a5af0a12ba4e.png",
-    price: "6.99"
+    id: "coconutty",
+    title: "Coconutty Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
   },
   {
-    id: "caramel-praline",
-    title: "Caramel Praline",
-    image: "/public/lovable-uploads/c3b5ce80-2d12-47c5-ad01-5dd6b68ece66.png", 
-    price: "6.99"
+    id: "bubblegum",
+    title: "Bubblegum Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png", 
+    price: "1.900"
   },
   {
-    id: "chocolate-fudge",
-    title: "Chocolate Fudge",
-    image: "/public/lovable-uploads/595cde14-035d-422a-a7f0-6c77c7a1370c.png",
-    price: "6.99"
+    id: "oreo",
+    title: "Oreo Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
   },
   {
-    id: "lime-sorbet",
-    title: "Lime Sorbet",
-    image: "/public/lovable-uploads/90da045e-8c11-4f07-9d5c-647f8ae7bd49.png",
-    price: "5.99"
+    id: "vanilla",
+    title: "Vanilla Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
   },
   {
-    id: "mango-sorbet",
-    title: "Mango Sorbet",
-    image: "/public/lovable-uploads/fdbb580d-b73f-4350-8f55-c1a36f70152e.png",
-    price: "5.99"
+    id: "cafe-espresso",
+    title: "Cafe Espresso Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
+  },
+  {
+    id: "becca-selvatica",
+    title: "Becca Selvatica Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
+  },
+  {
+    id: "chocolicious",
+    title: "Chocolicious Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
   },
   {
     id: "strawberry-cheesecake",
-    title: "Strawberry Cheesecake",
-    image: "/public/lovable-uploads/6172e215-ce04-45ed-81e8-0d5da45904d9.png",
-    price: "6.99"
+    title: "Strawberry Cheesecake Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
   },
   {
-    id: "milkshakes",
-    title: "Gelato Milkshakes",
-    image: "/public/lovable-uploads/07867876-13e2-4ed0-83ed-13a0369c8822.png",
-    price: "7.99"
+    id: "lotus",
+    title: "Lotus Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
+  },
+  {
+    id: "creme-caramel",
+    title: "Creme Caramel Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
+  },
+  {
+    id: "pistachio",
+    title: "Pistachio Gelato",
+    image: "/public/lovable-uploads/1784ffed-adea-413c-a053-22705d5b8419.png",
+    price: "1.900"
+  },
+  // Sorbets
+  {
+    id: "passion-fruit",
+    title: "Passion Fruit Sorbet",
+    image: "/public/lovable-uploads/8c0b7de9-45c2-43dc-9af9-84cc4d9f768f.png",
+    price: "1.900"
+  },
+  {
+    id: "lemon-mint",
+    title: "Lemon Mint Sorbet",
+    image: "/public/lovable-uploads/8c0b7de9-45c2-43dc-9af9-84cc4d9f768f.png",
+    price: "1.900"
+  },
+  {
+    id: "fragola",
+    title: "Fragola Sorbet",
+    image: "/public/lovable-uploads/8c0b7de9-45c2-43dc-9af9-84cc4d9f768f.png",
+    price: "1.900"
   }
 ];
 
@@ -74,7 +117,7 @@ export default function Shop() {
           handle: flavor.id,
           images: [{ src: flavor.image }],
           variants: [{ id: `${flavor.id}-regular`, price: flavor.price, title: "Regular Size" }],
-          tags: "Gelato,Premium"
+          tags: flavor.title.toLowerCase().includes('sorbet') ? "Sorbet" : "Gelato"
         }));
         
         const allProducts = [...shopifyProducts, ...localProducts];
@@ -152,20 +195,20 @@ export default function Shop() {
   const getDemoProducts = () => [
     {
       id: "gift-card-25",
-      title: "Gelatico Gift Card - $25",
+      title: "Gelatico Gift Card - 25 KD",
       description: "Share the joy of gelato with friends and family. A perfect gift for any occasion.",
       handle: "gift-card-25",
       images: [{ src: "/public/lovable-uploads/4b999340-0478-451a-bd04-7ed0eba14eb5.png" }],
-      variants: [{ id: "gift-card-25-variant", price: "25.00", title: "Default" }],
+      variants: [{ id: "gift-card-25-variant", price: "25.000", title: "Default" }],
       tags: "Gift Cards"
     },
     {
       id: "gift-card-50",
-      title: "Gelatico Gift Card - $50",
+      title: "Gelatico Gift Card - 50 KD",
       description: "Share the joy of gelato with friends and family. A perfect gift for any occasion.",
       handle: "gift-card-50",
       images: [{ src: "/public/lovable-uploads/4b999340-0478-451a-bd04-7ed0eba14eb5.png" }],
-      variants: [{ id: "gift-card-50-variant", price: "50.00", title: "Default" }],
+      variants: [{ id: "gift-card-50-variant", price: "50.000", title: "Default" }],
       tags: "Gift Cards"
     },
     ...flavorImages.map(flavor => ({
@@ -175,7 +218,7 @@ export default function Shop() {
       handle: flavor.id,
       images: [{ src: flavor.image }],
       variants: [{ id: `${flavor.id}-regular`, price: flavor.price, title: "Regular Size" }],
-      tags: "Gelato,Premium"
+      tags: flavor.title.toLowerCase().includes('sorbet') ? "Sorbet" : "Gelato"
     }))
   ] as ShopifyProduct[];
 
@@ -283,7 +326,7 @@ export default function Shop() {
                   
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">
-                      ${parseFloat(product.variants[0]?.price || '0').toFixed(2)}
+                      {parseFloat(product.variants[0]?.price || '0').toFixed(3)} KD
                     </span>
                     <button
                       onClick={() => addToCart(product)}
