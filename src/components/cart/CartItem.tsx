@@ -24,14 +24,17 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
       
       <div className="flex-1">
         <h3 className="font-medium">{item.title || 'Product'}</h3>
-        <p className="text-muted-foreground text-sm">
-          Variant: {item.variantId}
-        </p>
+        {item.variantTitle && item.variantTitle !== "Default" && (
+          <p className="text-muted-foreground text-sm">
+            {item.variantTitle}
+          </p>
+        )}
         <div className="mt-3 flex justify-between items-center">
           <div className="flex items-center border border-muted rounded-full overflow-hidden">
             <button
               onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
               className="px-2 py-1 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
+              aria-label="Decrease quantity"
             >
               <Minus size={14} />
             </button>
@@ -41,6 +44,7 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
             <button
               onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
               className="px-2 py-1 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
+              aria-label="Increase quantity"
             >
               <Plus size={14} />
             </button>
@@ -53,6 +57,7 @@ export default function CartItem({ item, updateQuantity, removeItem }: CartItemP
             <button
               onClick={() => removeItem(item.variantId)}
               className="text-muted-foreground hover:text-red-500 transition-colors duration-300"
+              aria-label="Remove item"
             >
               <Trash2 size={18} />
             </button>

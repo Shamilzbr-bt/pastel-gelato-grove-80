@@ -82,9 +82,11 @@ export default function Header() {
           to="/" 
           className="relative z-10 transition-all duration-300 hover:opacity-80"
         >
-          <h1 className="text-2xl md:text-3xl font-bold font-gelatico text-gelatico-pink">
-            Gelatico
-          </h1>
+          <img 
+            src="/public/lovable-uploads/2892a530-dfcf-4764-8487-557369ed7b21.png" 
+            alt="Gelatico" 
+            className="h-12 w-auto"
+          />
         </Link>
 
         {/* Desktop Navigation */}
@@ -142,6 +144,11 @@ export default function Header() {
             isMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full pointer-events-none"
           )}
         >
+          <img 
+            src="/public/lovable-uploads/6a86ae94-f6ae-4ab1-abd3-4587a6f0c711.png" 
+            alt="Gelatico Logo" 
+            className="w-24 h-24 object-contain mb-4"
+          />
           {navItems.map((item) => (
             <Link
               key={item.name}

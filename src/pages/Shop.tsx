@@ -7,6 +7,52 @@ import { ShoppingBag } from 'lucide-react';
 import { toast } from "sonner";
 import { shopifyService, ShopifyProduct, CartItem } from '@/services/shopify';
 
+// Define gelato flavors using the uploaded images
+const flavorImages = [
+  {
+    id: "cookies-cream",
+    title: "Cookies & Cream",
+    image: "/public/lovable-uploads/87089c2c-b9dc-4fd2-8479-a5af0a12ba4e.png",
+    price: "6.99"
+  },
+  {
+    id: "caramel-praline",
+    title: "Caramel Praline",
+    image: "/public/lovable-uploads/c3b5ce80-2d12-47c5-ad01-5dd6b68ece66.png", 
+    price: "6.99"
+  },
+  {
+    id: "chocolate-fudge",
+    title: "Chocolate Fudge",
+    image: "/public/lovable-uploads/595cde14-035d-422a-a7f0-6c77c7a1370c.png",
+    price: "6.99"
+  },
+  {
+    id: "lime-sorbet",
+    title: "Lime Sorbet",
+    image: "/public/lovable-uploads/90da045e-8c11-4f07-9d5c-647f8ae7bd49.png",
+    price: "5.99"
+  },
+  {
+    id: "mango-sorbet",
+    title: "Mango Sorbet",
+    image: "/public/lovable-uploads/fdbb580d-b73f-4350-8f55-c1a36f70152e.png",
+    price: "5.99"
+  },
+  {
+    id: "strawberry-cheesecake",
+    title: "Strawberry Cheesecake",
+    image: "/public/lovable-uploads/6172e215-ce04-45ed-81e8-0d5da45904d9.png",
+    price: "6.99"
+  },
+  {
+    id: "milkshakes",
+    title: "Gelato Milkshakes",
+    image: "/public/lovable-uploads/07867876-13e2-4ed0-83ed-13a0369c8822.png",
+    price: "7.99"
+  }
+];
+
 export default function Shop() {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +65,20 @@ export default function Shop() {
       setIsLoading(true);
       try {
         const shopifyProducts = await shopifyService.getProducts();
-        setProducts(shopifyProducts);
+        
+        // Combine Shopify products with our local flavor images
+        const localProducts = flavorImages.map(flavor => ({
+          id: flavor.id,
+          title: flavor.title,
+          description: `Premium Italian gelato made with the finest ingredients.`,
+          handle: flavor.id,
+          images: [{ src: flavor.image }],
+          variants: [{ id: `${flavor.id}-regular`, price: flavor.price, title: "Regular Size" }],
+          tags: "Gelato,Premium"
+        }));
+        
+        const allProducts = [...shopifyProducts, ...localProducts];
+        setProducts(allProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
         toast.error("Failed to load products. Using demo data instead.");
@@ -66,13 +125,23 @@ export default function Shop() {
             : item
         );
       } else {
-        return [...prevCart, { 
+        const newItem = { 
           variantId: variant.id, 
           quantity: 1,
           title: product.title,
           price: variant.price,
-          image: product.images[0]?.src
-        }];
+          image: product.images[0]?.src,
+          variantTitle: variant.title
+        };
+        
+        // Store updated cart in localStorage
+        const updatedCart = [...prevCart, newItem];
+        localStorage.setItem('gelatico-cart', JSON.stringify(updatedCart));
+        
+        // Dispatch event to notify other components
+        window.dispatchEvent(new Event('cart-updated'));
+        
+        return updatedCart;
       }
     });
     
@@ -86,7 +155,7 @@ export default function Shop() {
       title: "Gelatico Gift Card - $25",
       description: "Share the joy of gelato with friends and family. A perfect gift for any occasion.",
       handle: "gift-card-25",
-      images: [{ src: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1287&auto=format&fit=crop" }],
+      images: [{ src: "/public/lovable-uploads/4b999340-0478-451a-bd04-7ed0eba14eb5.png" }],
       variants: [{ id: "gift-card-25-variant", price: "25.00", title: "Default" }],
       tags: "Gift Cards"
     },
@@ -95,11 +164,19 @@ export default function Shop() {
       title: "Gelatico Gift Card - $50",
       description: "Share the joy of gelato with friends and family. A perfect gift for any occasion.",
       handle: "gift-card-50",
-      images: [{ src: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1287&auto=format&fit=crop" }],
+      images: [{ src: "/public/lovable-uploads/4b999340-0478-451a-bd04-7ed0eba14eb5.png" }],
       variants: [{ id: "gift-card-50-variant", price: "50.00", title: "Default" }],
       tags: "Gift Cards"
     },
-    // ... more demo products as needed
+    ...flavorImages.map(flavor => ({
+      id: flavor.id,
+      title: flavor.title,
+      description: `Premium Italian gelato made with the finest ingredients.`,
+      handle: flavor.id,
+      images: [{ src: flavor.image }],
+      variants: [{ id: `${flavor.id}-regular`, price: flavor.price, title: "Regular Size" }],
+      tags: "Gelato,Premium"
+    }))
   ] as ShopifyProduct[];
 
   return (
@@ -120,7 +197,7 @@ export default function Shop() {
             Shop Our Products
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Explore our collection of gift cards, gelato party boxes, and Gelatico branded merchandise. 
+            Explore our collection of premium gelato flavors, gift cards, and Gelatico branded merchandise. 
             Perfect for treating yourself or finding a special gift for the gelato lover in your life.
           </p>
         </motion.div>
@@ -211,6 +288,7 @@ export default function Shop() {
                     <button
                       onClick={() => addToCart(product)}
                       className="inline-flex items-center justify-center p-2 rounded-full bg-gelatico-pink text-white hover:bg-gelatico-pink/90 transition-all duration-300"
+                      aria-label={`Add ${product.title} to cart`}
                     >
                       <ShoppingBag size={18} />
                     </button>
@@ -260,7 +338,7 @@ export default function Shop() {
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?q=80&w=1287&auto=format&fit=crop" 
+                src="/public/lovable-uploads/4b999340-0478-451a-bd04-7ed0eba14eb5.png" 
                 alt="Gelatico Gift Card" 
                 className="rounded-2xl shadow-soft"
               />
