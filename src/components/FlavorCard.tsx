@@ -26,12 +26,6 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
     toast.success(`${flavor.name} added to your cart!`);
   };
 
-  // Helper function to parse price
-  const parsePrice = (price?: string): number => {
-    if (!price) return 0;
-    return parseFloat(price);
-  };
-
   return (
     <motion.div
       whileHover={layout === 'grid' ? { y: -8 } : undefined}
@@ -70,7 +64,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
           
           <div className="flex items-center justify-between mt-4">
             <span className="text-lg font-semibold text-foreground">
-              {formatPrice(parsePrice(flavor.price))}
+              {formatPrice(flavor.price || 0)}
             </span>
             
             <div className="flex items-center space-x-2">

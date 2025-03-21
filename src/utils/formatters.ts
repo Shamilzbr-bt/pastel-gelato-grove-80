@@ -2,8 +2,10 @@
 /**
  * Format price in KWD
  */
-export const formatPrice = (price: number) => {
-  return `${price.toFixed(3)} KWD`;
+export const formatPrice = (price: string | number) => {
+  // Convert to number if it's a string
+  const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
+  return `${numericPrice.toFixed(3)} KWD`;
 };
 
 /**
