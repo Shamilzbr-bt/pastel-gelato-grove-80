@@ -49,6 +49,11 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
     return 'bg-gray-100 text-gray-800';
   };
 
+  // Format price in KWD
+  const formatPrice = (price: number) => {
+    return `${price.toFixed(3)} KWD`;
+  };
+
   return (
     <motion.div
       whileHover={layout === 'grid' ? { y: -8 } : undefined}
@@ -106,7 +111,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
           
           <div className="flex items-center justify-between mt-4">
             <span className="text-lg font-semibold text-foreground">
-              ${flavor.price.toFixed(2)}
+              {formatPrice(flavor.price)}
             </span>
             
             <div className="flex items-center space-x-2">
