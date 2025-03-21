@@ -10,6 +10,12 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
+  // Helper function to parse price safely
+  const parsePrice = (price: string | undefined): number => {
+    if (!price) return 0;
+    return parseFloat(price);
+  };
+
   return (
     <motion.div
       layout
@@ -40,7 +46,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
         
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold">
-            {formatPrice(parseFloat(product.variants[0]?.price || '0'))}
+            {formatPrice(parsePrice(product.variants[0]?.price || '0'))}
           </span>
           <button
             onClick={() => onAddToCart(product)}

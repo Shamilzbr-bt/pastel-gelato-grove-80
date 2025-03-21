@@ -20,6 +20,9 @@ export interface Flavor {
     name: string;
     price: string;
   }[];
+  ingredients?: string[];
+  pairings?: string[];
+  nutritionalInfo?: string;
 }
 
 // Helper to check if a flavor is a sorbet
