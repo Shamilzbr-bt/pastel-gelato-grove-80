@@ -28,7 +28,7 @@ export default function ContainerSelector({
       type: 'cup', 
       size: 'minio', 
       name: 'Minio Cup', 
-      price: 1.900,
+      price: 1.600,
       description: 'Single scoop cup' 
     },
     { 
@@ -36,7 +36,7 @@ export default function ContainerSelector({
       type: 'cup', 
       size: 'medio', 
       name: 'Medio Cup', 
-      price: 2.900,
+      price: 1.950,
       description: 'Double scoop cup' 
     },
     { 
@@ -44,7 +44,7 @@ export default function ContainerSelector({
       type: 'cup', 
       size: 'megano', 
       name: 'Megano Cup', 
-      price: 3.900,
+      price: 2.350,
       description: 'Triple scoop cup' 
     },
     
@@ -54,15 +54,15 @@ export default function ContainerSelector({
       type: 'cone', 
       size: 'standard', 
       name: 'Standard Cone', 
-      price: 1.900,
+      price: 1.350,
       description: 'Single scoop cone' 
     },
     { 
       id: 'cone-tower', 
       type: 'cone', 
       size: 'tower', 
-      name: 'Tower Cone', 
-      price: 2.900,
+      name: 'Mega Cone', 
+      price: 1.950,
       description: 'Double scoop cone' 
     },
   ];

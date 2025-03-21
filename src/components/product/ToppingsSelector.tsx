@@ -19,18 +19,18 @@ interface ToppingsSelectorProps {
 export default function ToppingsSelector({ selectedToppings, onToppingsChange, maxSelections = 3 }: ToppingsSelectorProps) {
   const toppings: Topping[] = [
     // Add-ons
-    { id: 'marshmallow', name: 'Marshmallow', price: 0.250, category: 'addons' },
-    { id: 'oreo', name: 'Oreo Crumbs', price: 0.250, category: 'addons' },
-    { id: 'sprinkles', name: 'Sprinkles', price: 0.250, category: 'addons' },
-    { id: 'nuts', name: 'Mixed Nuts', price: 0.250, category: 'addons' },
-    { id: 'brownies', name: 'Brownie Pieces', price: 0.250, category: 'addons' },
+    { id: 'marshmallow', name: 'Marshmallow', price: 0.400, category: 'addons' },
+    { id: 'oreo', name: 'Oreo Crumbs', price: 0.400, category: 'addons' },
+    { id: 'sprinkles', name: 'Sprinkles', price: 0.400, category: 'addons' },
+    { id: 'nuts', name: 'Mixed Nuts', price: 0.400, category: 'addons' },
+    { id: 'brownies', name: 'Brownie Pieces', price: 0.400, category: 'addons' },
     
     // Sauces
-    { id: 'chocolate', name: 'Chocolate Sauce', price: 0.250, category: 'sauces' },
-    { id: 'caramel', name: 'Caramel Sauce', price: 0.250, category: 'sauces' },
-    { id: 'pistachio', name: 'Pistachio Sauce', price: 0.250, category: 'sauces' },
-    { id: 'strawberry', name: 'Strawberry Sauce', price: 0.250, category: 'sauces' },
-    { id: 'honey', name: 'Honey', price: 0.250, category: 'sauces' },
+    { id: 'chocolate', name: 'Chocolate Sauce', price: 0.350, category: 'sauces' },
+    { id: 'caramel', name: 'Caramel Sauce', price: 0.350, category: 'sauces' },
+    { id: 'pistachio', name: 'Pistachio Sauce', price: 0.350, category: 'sauces' },
+    { id: 'strawberry', name: 'Strawberry Sauce', price: 0.350, category: 'sauces' },
+    { id: 'honey', name: 'Honey', price: 0.350, category: 'sauces' },
   ];
   
   const addonsOptions = toppings.filter(topping => topping.category === 'addons');
