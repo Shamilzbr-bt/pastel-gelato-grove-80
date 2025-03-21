@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-interface Topping {
+export interface Topping {
   id: string;
   name: string;
   price: number;
@@ -11,13 +11,12 @@ interface Topping {
 }
 
 interface ToppingsSelectorProps {
-  onSelectToppings: (toppings: Topping[]) => void;
+  selectedToppings: string[];
+  onToppingsChange: (toppings: string[]) => void;
   maxSelections?: number;
 }
 
-export default function ToppingsSelector({ onSelectToppings, maxSelections = 3 }: ToppingsSelectorProps) {
-  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
-  
+export default function ToppingsSelector({ selectedToppings, onToppingsChange, maxSelections = 3 }: ToppingsSelectorProps) {
   const toppings: Topping[] = [
     // Add-ons
     { id: 'marshmallow', name: 'Marshmallow', price: 0.250, category: 'addons' },
@@ -38,31 +37,28 @@ export default function ToppingsSelector({ onSelectToppings, maxSelections = 3 }
   const saucesOptions = toppings.filter(topping => topping.category === 'sauces');
   
   const toggleTopping = (topping: Topping) => {
-    setSelectedToppings(prev => {
-      // Check if this topping is already selected
-      const isSelected = prev.some(item => item.id === topping.id);
-      
-      let newSelection;
-      if (isSelected) {
-        // Remove the topping if already selected
-        newSelection = prev.filter(item => item.id !== topping.id);
+    let newSelection;
+    // Check if this topping is already selected
+    const isSelected = selectedToppings.includes(topping.id);
+    
+    if (isSelected) {
+      // Remove the topping if already selected
+      newSelection = selectedToppings.filter(id => id !== topping.id);
+    } else {
+      // Add the topping if not at max selections
+      if (selectedToppings.length < maxSelections) {
+        newSelection = [...selectedToppings, topping.id];
       } else {
-        // Add the topping if not at max selections
-        if (prev.length < maxSelections) {
-          newSelection = [...prev, topping];
-        } else {
-          // At max selections, don't change
-          newSelection = prev;
-        }
+        // At max selections, don't change
+        newSelection = selectedToppings;
       }
-      
-      // Notify parent component of the change
-      onSelectToppings(newSelection);
-      return newSelection;
-    });
+    }
+    
+    // Notify parent component of the change
+    onToppingsChange(newSelection);
   };
   
-  const isToppingSelected = (id: string) => selectedToppings.some(topping => topping.id === id);
+  const isToppingSelected = (id: string) => selectedToppings.includes(id);
   
   return (
     <div className="space-y-6">

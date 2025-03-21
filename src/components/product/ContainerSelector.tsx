@@ -14,12 +14,12 @@ export type ContainerOption = {
 
 interface ContainerSelectorProps {
   selectedContainer: string;
-  setSelectedContainer: (value: string) => void;
+  onContainerChange: (value: string) => void;
 }
 
 export default function ContainerSelector({ 
   selectedContainer, 
-  setSelectedContainer 
+  onContainerChange 
 }: ContainerSelectorProps) {
   const containerOptions: ContainerOption[] = [
     // Cup options
@@ -76,7 +76,7 @@ export default function ContainerSelector({
         <h3 className="text-lg font-semibold mb-4">Cup Options</h3>
         <RadioGroup
           value={selectedContainer}
-          onValueChange={setSelectedContainer}
+          onValueChange={onContainerChange}
           className="grid grid-cols-1 sm:grid-cols-3 gap-4"
         >
           {cupOptions.map((option) => (
@@ -111,7 +111,7 @@ export default function ContainerSelector({
         <h3 className="text-lg font-semibold mb-4">Cone Options</h3>
         <RadioGroup
           value={selectedContainer}
-          onValueChange={setSelectedContainer}
+          onValueChange={onContainerChange}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4"
         >
           {coneOptions.map((option) => (

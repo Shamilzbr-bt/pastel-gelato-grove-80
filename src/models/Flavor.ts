@@ -13,7 +13,7 @@ export interface Flavor {
     sugar?: number;
   };
   featured?: boolean;
-  price?: string;
+  price?: string | number;
   category?: string;
   variants?: {
     id: string;

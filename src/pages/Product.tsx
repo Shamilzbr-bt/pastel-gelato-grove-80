@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -298,15 +299,15 @@ export default function Product() {
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-2">Customize Your Order</h3>
               <ContainerSelector 
-                selected={selectedContainer}
-                onSelect={setSelectedContainer}
+                selectedContainer={selectedContainer}
+                onContainerChange={setSelectedContainer}
               />
             </div>
 
             <div className="mb-6">
               <ToppingsSelector 
-                selected={selectedToppings}
-                onSelectToppings={setSelectedToppings}
+                selectedToppings={selectedToppings}
+                onToppingsChange={setSelectedToppings}
               />
             </div>
 
