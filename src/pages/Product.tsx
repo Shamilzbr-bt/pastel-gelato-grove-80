@@ -1,295 +1,329 @@
-
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Minus, Plus, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Button } from "@/components/ui/button";
-import { Flavor } from '@/components/FlavorCard';
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { motion } from 'framer-motion';
+import { ChevronLeft, ShoppingBag } from 'lucide-react';
+import ContainerSelector from '@/components/product/ContainerSelector';
 import ToppingsSelector from '@/components/product/ToppingsSelector';
-import ContainerSelector, { ContainerOption } from '@/components/product/ContainerSelector';
+import { Flavor } from '@/models/Flavor';
+import { isSorbet } from '@/models/Flavor';
+import { toast } from "sonner";
 
-interface Topping {
+interface ProductPageParams {
   id: string;
-  name: string;
-  price: number;
-  category: 'addons' | 'sauces';
 }
 
 export default function Product() {
-  const { id } = useParams<{ id: string }>();
+  const [selectedContainer, setSelectedContainer] = useState('cup');
+  const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
   const [flavor, setFlavor] = useState<Flavor | null>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedContainer, setSelectedContainer] = useState('cup-minio');
-  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
-  
-  // Mock getting flavor data
+  const { id } = useParams<ProductPageParams>();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    setIsLoading(true);
-    
-    // This would be a fetch to your API in a real application
-    setTimeout(() => {
-      const mockFlavor: Flavor = {
-        id: "strawberry-dream",
-        name: "Strawberry Dream",
-        description: "Creamy gelato bursting with real strawberry pieces and a hint of vanilla. Each scoop brings you the taste of fresh summer strawberries, picked at the peak of ripeness and blended into our signature gelato base.",
-        image: "https://images.unsplash.com/photo-1557142046-c704a3adf364?q=80&w=687&auto=format&fit=crop",
-        price: 1.900,
-        tags: ["Classic", "Seasonal"],
-        ingredients: ["Milk", "Cream", "Sugar", "Strawberries", "Vanilla extract"],
-        nutritionalInfo: {
-          calories: 220,
-          fat: 12,
-          carbs: 25,
-          protein: 3,
-        },
-        pairings: ["Chocolate Chip", "Pistachio", "Lemon Sorbet"]
-      };
-      
-      setFlavor(mockFlavor);
-      setIsLoading(false);
-    }, 800);
-  }, [id]);
-
-  const handleQuantityChange = (type: 'increase' | 'decrease') => {
-    if (type === 'increase') {
-      setQuantity(prev => prev + 1);
-    } else if (type === 'decrease' && quantity > 1) {
-      setQuantity(prev => prev - 1);
-    }
-  };
-
-  const handleToppingsChange = (toppings: Topping[]) => {
-    setSelectedToppings(toppings);
-  };
-
-  // Calculate total price
-  const calculateTotalPrice = () => {
-    if (!flavor) return 0;
-    
-    // Container price
-    const containerOptions: ContainerOption[] = [
-      { id: 'cup-minio', type: 'cup', size: 'minio', name: 'Minio Cup', price: 1.900, description: 'Single scoop cup' },
-      { id: 'cup-medio', type: 'cup', size: 'medio', name: 'Medio Cup', price: 2.900, description: 'Double scoop cup' },
-      { id: 'cup-megano', type: 'cup', size: 'megano', name: 'Megano Cup', price: 3.900, description: 'Triple scoop cup' },
-      { id: 'cone-standard', type: 'cone', size: 'standard', name: 'Standard Cone', price: 1.900, description: 'Single scoop cone' },
-      { id: 'cone-tower', type: 'cone', size: 'tower', name: 'Tower Cone', price: 2.900, description: 'Double scoop cone' },
+    // Mocked flavor data for demonstration
+    const mockedFlavors: Flavor[] = [
+      {
+        id: "coconutty",
+        name: "Coconutty Gelato",
+        description: "Creamy coconut gelato with toasted coconut flakes.",
+        image: "/public/lovable-uploads/08ff6f2d-b912-4096-9a20-d31d7c5dc7ea.png",
+        tags: ["Gelato", "Coconut"],
+        nutrition: { calories: 250, fat: 15, carbs: 25, protein: 3, sugar: 20 },
+        featured: true,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "coconutty-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "bubblegum",
+        name: "Bubblegum Gelato",
+        description: "Sweet and nostalgic bubblegum flavored gelato.",
+        image: "/public/lovable-uploads/68fdfc78-f84f-4411-b18a-ab7ce14b9128.png",
+        tags: ["Gelato", "Bubblegum"],
+        nutrition: { calories: 240, fat: 14, carbs: 26, protein: 2, sugar: 22 },
+        featured: false,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "bubblegum-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "oreo",
+        name: "Oreo Gelato",
+        description: "Rich and creamy gelato with chunks of Oreo cookies.",
+        image: "/public/lovable-uploads/6bc2aabc-0a5a-4554-a821-4dd77f9c8aea.png",
+        tags: ["Gelato", "Oreo"],
+        nutrition: { calories: 260, fat: 16, carbs: 28, protein: 4, sugar: 24 },
+        featured: true,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "oreo-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "vanilla",
+        name: "Vanilla Gelato",
+        description: "Classic vanilla gelato made with real vanilla beans.",
+        image: "/public/lovable-uploads/91b50f06-99cd-4593-938f-fabd0d114f7b.png",
+        tags: ["Gelato", "Vanilla"],
+        nutrition: { calories: 230, fat: 13, carbs: 24, protein: 2, sugar: 20 },
+        featured: false,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "vanilla-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "cafe-espresso",
+        name: "Cafe Espresso Gelato",
+        description: "Intense coffee flavored gelato with a hint of chocolate.",
+        image: "/public/lovable-uploads/08f8de83-510c-4b2c-b0f2-757448f1874c.png",
+        tags: ["Gelato", "Coffee"],
+        nutrition: { calories: 250, fat: 15, carbs: 25, protein: 3, sugar: 20 },
+        featured: true,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "cafe-espresso-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "becca-selvatica",
+        name: "Becca Selvatica Gelato",
+        description: "Unique blend of wild berries and cream in a smooth gelato.",
+        image: "/public/lovable-uploads/bef4f851-ea34-4b80-ae6b-5f8094f7fe6c.png",
+        tags: ["Gelato", "Berries"],
+        nutrition: { calories: 240, fat: 14, carbs: 26, protein: 2, sugar: 22 },
+        featured: false,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "becca-selvatica-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "chocolicious",
+        name: "Chocolicious Gelato",
+        description: "Extra rich chocolate gelato with dark chocolate shavings.",
+        image: "/public/lovable-uploads/c13867b5-479c-403b-a532-b17b6554c0b6.png",
+        tags: ["Gelato", "Chocolate"],
+        nutrition: { calories: 260, fat: 16, carbs: 28, protein: 4, sugar: 24 },
+        featured: true,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "chocolicious-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "strawberry-cheesecake",
+        name: "Strawberry Cheesecake Gelato",
+        description: "Delicious combination of strawberry and cheesecake flavors in a creamy gelato.",
+        image: "/public/lovable-uploads/45be5889-006a-4270-a4ee-872ed44d60d1.png",
+        tags: ["Gelato", "Strawberry", "Cheesecake"],
+        nutrition: { calories: 250, fat: 15, carbs: 25, protein: 3, sugar: 20 },
+        featured: false,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "strawberry-cheesecake-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "lotus",
+        name: "Lotus Gelato",
+        description: "Unique gelato with the distinctive taste of Lotus Biscoff cookies.",
+        image: "/public/lovable-uploads/08d5a940-b374-4d78-be3f-e5525d651fe6.png",
+        tags: ["Gelato", "Lotus"],
+        nutrition: { calories: 260, fat: 16, carbs: 28, protein: 4, sugar: 24 },
+        featured: true,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "lotus-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "creme-caramel",
+        name: "Creme Caramel Gelato",
+        description: "Smooth and sweet creme caramel flavored gelato.",
+        image: "/public/lovable-uploads/121dee10-adac-45ae-8ece-eaa383e8e50b.png",
+        tags: ["Gelato", "Caramel"],
+        nutrition: { calories: 240, fat: 14, carbs: 26, protein: 2, sugar: 22 },
+        featured: false,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "creme-caramel-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "pistachio",
+        name: "Pistachio Gelato",
+        description: "Authentic pistachio gelato made with real pistachios.",
+        image: "/public/lovable-uploads/2a94f97e-5d11-4c16-a825-93e84c05349d.png",
+        tags: ["Gelato", "Pistachio"],
+        nutrition: { calories: 250, fat: 15, carbs: 25, protein: 3, sugar: 20 },
+        featured: true,
+        price: "1.900",
+        category: "Gelato",
+        variants: [{ id: "pistachio-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "passion-fruit",
+        name: "Passion Fruit Sorbet",
+        description: "Refreshing passion fruit sorbet with a tangy flavor.",
+        image: "/public/lovable-uploads/30d31163-952c-46c0-bbdf-0d6cdce4644f.png",
+        tags: ["Sorbet", "Passion Fruit"],
+        nutrition: { calories: 200, fat: 0, carbs: 50, protein: 1, sugar: 40 },
+        featured: false,
+        price: "1.900",
+        category: "Sorbet",
+        variants: [{ id: "passion-fruit-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "lemon-mint",
+        name: "Lemon Mint Sorbet",
+        description: "Zesty lemon sorbet with a hint of fresh mint.",
+        image: "/public/lovable-uploads/c80c3756-ab46-4f52-8c9f-5331b5964be1.png",
+        tags: ["Sorbet", "Lemon", "Mint"],
+        nutrition: { calories: 190, fat: 0, carbs: 48, protein: 0, sugar: 38 },
+        featured: true,
+        price: "1.900",
+        category: "Sorbet",
+        variants: [{ id: "lemon-mint-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "fragola",
+        name: "Fragola Sorbet",
+        description: "Sweet and fruity strawberry sorbet.",
+        image: "/public/lovable-uploads/f157d2dd-07de-44d1-b4dd-9cf9d433db54.png",
+        tags: ["Sorbet", "Strawberry"],
+        nutrition: { calories: 200, fat: 0, carbs: 50, protein: 1, sugar: 40 },
+        featured: false,
+        price: "1.900",
+        category: "Sorbet",
+        variants: [{ id: "fragola-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "tropical-fusion",
+        name: "Tropical Fusion Sorbet",
+        description: "Exotic blend of tropical fruits in a refreshing sorbet.",
+        image: "/public/lovable-uploads/8b030dc4-c8c6-4050-8198-0a33c9fdd312.png",
+        tags: ["Sorbet", "Tropical"],
+        nutrition: { calories: 210, fat: 0, carbs: 52, protein: 1, sugar: 42 },
+        featured: true,
+        price: "1.900",
+        category: "Sorbet",
+        variants: [{ id: "tropical-fusion-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "mango",
+        name: "Mango Sorbet",
+        description: "Smooth and creamy mango sorbet.",
+        image: "/public/lovable-uploads/b46d4ebf-e0ea-4c47-89b9-0c15123ec875.png",
+        tags: ["Sorbet", "Mango"],
+        nutrition: { calories: 200, fat: 0, carbs: 50, protein: 1, sugar: 40 },
+        featured: false,
+        price: "1.900",
+        category: "Sorbet",
+        variants: [{ id: "mango-regular", name: "Regular", price: "1.900" }]
+      },
+      {
+        id: "raspberry",
+        name: "Raspberry Sorbet",
+        description: "Tangy and refreshing raspberry sorbet.",
+        image: "/public/lovable-uploads/abcafc13-aa1b-452e-a560-7e729fb20e0c.png",
+        tags: ["Sorbet", "Raspberry"],
+        nutrition: { calories: 190, fat: 0, carbs: 48, protein: 0, sugar: 38 },
+        featured: true,
+        price: "1.900",
+        category: "Sorbet",
+        variants: [{ id: "raspberry-regular", name: "Regular", price: "1.900" }]
+      }
     ];
-    
-    const selectedOption = containerOptions.find(option => option.id === selectedContainer);
-    const containerPrice = selectedOption?.price || flavor.price;
-    
-    // Toppings price
-    const toppingsPriceTotal = selectedToppings.reduce((sum, topping) => sum + topping.price, 0);
-    
-    // Total for one item
-    const singleItemPrice = containerPrice + toppingsPriceTotal;
-    
-    // Multiply by quantity
-    return singleItemPrice * quantity;
-  };
+
+    const foundFlavor = mockedFlavors.find(f => f.id === id);
+    if (foundFlavor) {
+      setFlavor(foundFlavor);
+    } else {
+      toast.error("Flavor not found!");
+      navigate('/flavors');
+    }
+  }, [id, navigate]);
 
   const handleAddToCart = () => {
-    if (flavor) {
-      const toppingsText = selectedToppings.length > 0 
-        ? ` with ${selectedToppings.map(t => t.name).join(', ')}` 
-        : '';
-      
-      const containerOptions: ContainerOption[] = [
-        { id: 'cup-minio', type: 'cup', size: 'minio', name: 'Minio Cup', price: 1.900, description: 'Single scoop cup' },
-        { id: 'cup-medio', type: 'cup', size: 'medio', name: 'Medio Cup', price: 2.900, description: 'Double scoop cup' },
-        { id: 'cup-megano', type: 'cup', size: 'megano', name: 'Megano Cup', price: 3.900, description: 'Triple scoop cup' },
-        { id: 'cone-standard', type: 'cone', size: 'standard', name: 'Standard Cone', price: 1.900, description: 'Single scoop cone' },
-        { id: 'cone-tower', type: 'cone', size: 'tower', name: 'Tower Cone', price: 2.900, description: 'Double scoop cone' },
-      ];
-      
-      const selectedOption = containerOptions.find(option => option.id === selectedContainer);
-      
-      toast.success(`${quantity} ${selectedOption?.name || ''} of ${flavor.name}${toppingsText} added to your cart!`);
+    if (!flavor) {
+      toast.error("Flavor details not loaded yet.");
+      return;
     }
+
+    // Basic cart logic - can be expanded
+    toast.success(`${flavor.name} added to cart with ${selectedContainer} and toppings: ${selectedToppings.join(', ')}`);
   };
-  
-  const getTagClass = (tag: string) => {
-    const tagLower = tag.toLowerCase();
-    if (tagLower === 'vegan') return 'flavor-tag-vegan';
-    if (tagLower === 'dairy-free') return 'flavor-tag-dairy-free';
-    if (tagLower === 'sugar-free') return 'flavor-tag-sugar-free';
-    if (tagLower === 'classic') return 'flavor-tag-classic';
-    if (tagLower === 'seasonal') return 'flavor-tag-seasonal';
-    return 'bg-gray-100 text-gray-800';
-  };
+
+  if (!flavor) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
-      <div className="page-container pt-32">
-        <Link 
-          to="/flavors" 
-          className="inline-flex items-center mb-8 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
-        >
-          <ArrowLeft size={16} className="mr-2" />
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        className="page-container pt-32"
+      >
+        <button onClick={() => navigate('/flavors')} className="mb-4 inline-flex items-center gelatico-button-secondary">
+          <ChevronLeft size={20} className="mr-2" />
           Back to Flavors
-        </Link>
-        
-        {isLoading ? (
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="w-16 h-16 rounded-full border-4 border-gelatico-baby-pink border-t-gelatico-pink animate-spin"></div>
-          </div>
-        ) : flavor ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Product Image */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative rounded-3xl overflow-hidden shadow-soft"
-            >
-              <img 
-                src={flavor.image} 
-                alt={flavor.name} 
-                className="w-full h-full object-cover aspect-square lg:aspect-auto lg:h-[500px]"
+        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="relative"
+          >
+            <img 
+              src={flavor.image} 
+              alt={flavor.name} 
+              className="rounded-2xl shadow-lg w-full h-auto" 
+            />
+            <div className="absolute top-3 left-3">
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/70 backdrop-blur-sm text-gelatico-pink">
+                {isSorbet(flavor) ? 'Sorbet' : 'Gelato'}
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-4xl font-bold font-gelatico mb-4">{flavor.name}</h1>
+            <p className="text-muted-foreground mb-6">{flavor.description}</p>
+
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-2">Customize Your Order</h3>
+              <ContainerSelector 
+                selectedContainer={selectedContainer}
+                onContainerChange={setSelectedContainer}
               />
-              
-              {/* Tags overlay */}
-              <div className="absolute top-4 left-4 flex flex-wrap max-w-[calc(100%-32px)]">
-                {flavor.tags.map((tag, index) => (
-                  <span 
-                    key={index} 
-                    className={cn("flavor-tag", getTagClass(tag))}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-            
-            {/* Product Details */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-4xl md:text-5xl font-bold font-gelatico mb-4">
-                {flavor.name}
-              </h1>
-              
-              <p className="text-muted-foreground mb-6">
-                {flavor.description}
-              </p>
-              
-              {/* Container Selection */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Choose Your Container</h3>
-                <ContainerSelector
-                  selectedContainer={selectedContainer}
-                  setSelectedContainer={setSelectedContainer}
-                />
-              </div>
-              
-              {/* Toppings Selection */}
-              <div className="mb-6">
-                <ToppingsSelector onSelectToppings={handleToppingsChange} maxSelections={3} />
-              </div>
-              
-              {/* Ingredients */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Ingredients</h3>
-                <p className="text-muted-foreground">
-                  {flavor.ingredients?.join(', ')}
-                </p>
-              </div>
-              
-              {/* Nutritional Info */}
-              {flavor.nutritionalInfo && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3">Nutritional Information</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="text-center p-3 rounded-xl bg-muted">
-                      <p className="text-sm text-muted-foreground">Calories</p>
-                      <p className="font-semibold">{flavor.nutritionalInfo.calories}</p>
-                    </div>
-                    <div className="text-center p-3 rounded-xl bg-muted">
-                      <p className="text-sm text-muted-foreground">Fat</p>
-                      <p className="font-semibold">{flavor.nutritionalInfo.fat}g</p>
-                    </div>
-                    <div className="text-center p-3 rounded-xl bg-muted">
-                      <p className="text-sm text-muted-foreground">Carbs</p>
-                      <p className="font-semibold">{flavor.nutritionalInfo.carbs}g</p>
-                    </div>
-                    <div className="text-center p-3 rounded-xl bg-muted">
-                      <p className="text-sm text-muted-foreground">Protein</p>
-                      <p className="font-semibold">{flavor.nutritionalInfo.protein}g</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Perfect Pairings */}
-              {flavor.pairings && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-2">Perfect Pairings</h3>
-                  <p className="text-muted-foreground">
-                    {flavor.pairings.join(', ')}
-                  </p>
-                </div>
-              )}
-              
-              {/* Price and Add to Cart Section */}
-              <div className="mt-8 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold">Total</h3>
-                  <span className="text-xl font-bold">{calculateTotalPrice().toFixed(3)} KD</span>
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center border border-muted-foreground/30 rounded-full overflow-hidden">
-                    <button
-                      onClick={() => handleQuantityChange('decrease')}
-                      className="px-4 py-2 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
-                      disabled={quantity <= 1}
-                    >
-                      <Minus size={16} />
-                    </button>
-                    
-                    <span className="w-10 text-center">{quantity}</span>
-                    
-                    <button
-                      onClick={() => handleQuantityChange('increase')}
-                      className="px-4 py-2 text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
-                    >
-                      <Plus size={16} />
-                    </button>
-                  </div>
-                  
-                  <Button 
-                    onClick={handleAddToCart}
-                    className="gelatico-button flex-1 sm:flex-none"
-                  >
-                    <ShoppingBag className="mr-2" size={18} />
-                    Add to Cart
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold mb-4">Flavor Not Found</h2>
-            <p className="text-muted-foreground mb-6">
-              Sorry, we couldn't find the flavor you're looking for.
-            </p>
-            <Link to="/flavors" className="gelatico-button">
-              Browse All Flavors
-            </Link>
-          </div>
-        )}
-      </div>
-      
+            </div>
+
+            <div className="mb-6">
+              <ToppingsSelector 
+                selectedToppings={selectedToppings}
+                onToppingsChange={setSelectedToppings}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-semibold text-gelatico-pink">{flavor.price} KD</span>
+              <button 
+                onClick={handleAddToCart}
+                className="gelatico-button inline-flex items-center"
+              >
+                Add to Cart <ShoppingBag size={20} className="ml-2" />
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+
       <Footer />
     </div>
   );

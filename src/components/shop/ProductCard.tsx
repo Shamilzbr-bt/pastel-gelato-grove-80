@@ -40,7 +40,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
         
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold">
-            {formatPrice(product.variants[0]?.price || '0')}
+            {formatPrice(parseFloat(product.variants[0]?.price || '0'))}
           </span>
           <button
             onClick={() => onAddToCart(product)}

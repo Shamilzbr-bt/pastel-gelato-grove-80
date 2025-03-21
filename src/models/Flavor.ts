@@ -4,14 +4,35 @@ export interface Flavor {
   name: string;
   description: string;
   image: string;
-  price: number;
   tags: string[];
-  ingredients?: string[];
-  nutritionalInfo?: {
+  nutrition?: {
     calories: number;
     fat: number;
     carbs: number;
     protein: number;
+    sugar?: number;
   };
-  pairings?: string[];
+  featured?: boolean;
+  price?: string;
+  category?: string;
+  variants?: {
+    id: string;
+    name: string;
+    price: string;
+  }[];
+}
+
+// Helper to check if a flavor is a sorbet
+export function isSorbet(flavor: Flavor): boolean {
+  return flavor.tags.some(tag => 
+    tag.toLowerCase() === 'sorbet' || 
+    flavor.name.toLowerCase().includes('sorbet')
+  );
+}
+
+// Helper to get the primary category of a flavor
+export function getFlavorCategory(flavor: Flavor): string {
+  if (isSorbet(flavor)) return 'Sorbet';
+  if (flavor.tags.some(tag => tag.toLowerCase().includes('milkshake'))) return 'Milkshake';
+  return 'Gelato';
 }

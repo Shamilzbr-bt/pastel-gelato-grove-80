@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FlavorGrid from '@/components/FlavorGrid';
-import { Flavor } from '@/components/FlavorCard';
+import { Flavor } from '@/models/Flavor';
 
 export default function Flavors() {
   const [flavors, setFlavors] = useState<Flavor[]>([
