@@ -58,7 +58,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
             "p-4",
             layout === 'featured' && "md:flex-1"
           )}>
-            <h3 className="heading text-xl font-bold font-gelatico mb-2 group-hover:text-gelatico-pink transition-colors duration-300">
+            <h3 className="heading text-xl font-bold font-gelatico mb-2 text-white group-hover:text-gelatico-pink transition-colors duration-300">
               {flavor.name}
             </h3>
             
