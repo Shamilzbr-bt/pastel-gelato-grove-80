@@ -77,8 +77,6 @@
   font-size: 20px;
   text-transform: capitalize;
   font-weight: 700;
-  color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .card p:not(.heading) {
