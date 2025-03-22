@@ -17,7 +17,10 @@ export default function FlavorImage({ image, name, tags, layout = 'grid' }: Flav
   // Function to clean image path
   const cleanImagePath = (path: string) => {
     // Remove /public prefix if it exists
-    return path.startsWith('/public/') ? path.substring(7) : path;
+    if (path.startsWith('/public/')) {
+      return path.substring(7);
+    }
+    return path;
   };
   
   return (
