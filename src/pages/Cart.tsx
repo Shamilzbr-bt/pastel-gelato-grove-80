@@ -10,6 +10,7 @@ import CartItemList from '@/components/cart/CartItemList';
 import OrderSummary from '@/components/cart/OrderSummary';
 import EmptyCart from '@/components/cart/EmptyCart';
 import { checkoutService } from '@/services/checkout';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Cart() {
   const { 
@@ -21,6 +22,7 @@ export default function Cart() {
     calculateSubtotal 
   } = useCart();
   
+  const { user } = useAuth();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const navigate = useNavigate();
   
@@ -30,29 +32,15 @@ export default function Cart() {
       return;
     }
     
-    setIsCheckingOut(true);
-    
-    try {
-      // Process the checkout locally
-      const response = await checkoutService.processCheckout(cartItems);
-      
-      if (response.success) {
-        toast.success("Order processed successfully!");
-        
-        // Clear the cart after successful checkout
-        clearCart();
-        
-        // Navigate to success page with order details
-        navigate(`/checkout-success?orderId=${response.orderId}`);
-      } else {
-        toast.error(response.error || "There was a problem processing your order");
-      }
-    } catch (error) {
-      console.error('Error processing checkout:', error);
-      toast.error("There was a problem processing your order. Please try again.");
-    } finally {
-      setIsCheckingOut(false);
+    // If user is not logged in, redirect to login page
+    if (!user) {
+      toast.info("Please sign in to continue to checkout");
+      navigate("/login", { state: { from: "/checkout" } });
+      return;
     }
+    
+    // Navigate to checkout page
+    navigate("/checkout");
   };
   
   const subtotal = calculateSubtotal();

@@ -1,14 +1,23 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { ShoppingCart, Menu, X, User, Package } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,6 +78,10 @@ export default function Header() {
     return location.pathname.startsWith(path);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <header 
       className={cn(
@@ -106,6 +119,40 @@ export default function Header() {
             </Link>
           ))}
 
+          {/* Account Menu */}
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center justify-center w-9 h-9 rounded-full bg-gelatico-baby-pink/20 text-gelatico-pink hover:bg-gelatico-baby-pink/30 transition-colors">
+                <User size={18} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/account">My Account</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/account/orders">My Orders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/account/addresses">Saved Addresses</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/account/favorites">Favorites</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link 
+              to="/login" 
+              className="text-sm font-medium transition-all duration-300 hover:text-gelatico-pink"
+            >
+              Sign In
+            </Link>
+          )}
+
           <Link 
             to="/cart" 
             className="relative p-2 text-foreground transition-all duration-300 hover:text-gelatico-pink"
@@ -119,6 +166,15 @@ export default function Header() {
 
         {/* Mobile: Menu Button & Cart */}
         <div className="flex items-center space-x-4 md:hidden">
+          {user && (
+            <Link 
+              to="/account" 
+              className="relative p-1 text-foreground transition-all duration-300 hover:text-gelatico-pink"
+            >
+              <User size={20} />
+            </Link>
+          )}
+          
           <Link 
             to="/cart" 
             className="relative p-1 text-foreground transition-all duration-300 hover:text-gelatico-pink"
@@ -161,6 +217,30 @@ export default function Header() {
               {item.name}
             </Link>
           ))}
+          
+          {user ? (
+            <>
+              <Link
+                to="/account"
+                className="text-xl font-medium transition-all duration-300 text-foreground"
+              >
+                My Account
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="text-xl font-medium transition-all duration-300 text-red-600"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="text-xl font-medium transition-all duration-300 text-foreground"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </header>
