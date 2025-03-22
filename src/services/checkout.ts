@@ -6,12 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
 export interface CheckoutAddress {
   first_name?: string;
   last_name?: string;
-  address1?: string;
-  address2?: string;
-  city?: string;
-  province?: string;
-  country?: string;
-  zip?: string;
+  governorate?: string;
+  flat_no?: string;
+  building_number?: string;
+  block?: string;
+  street?: string;
+  avenue?: string;
+  paci?: string;
   phone?: string;
   is_default?: boolean;
 }
@@ -91,16 +92,16 @@ export const checkoutService = {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Create an order in the database - cast Json data appropriately
+      // Create an order in the database
       const { data: order, error } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
           status: 'pending',
           total_amount: totalAmount,
-          items: orderSummary as any, // Cast to any since we know this matches Json structure
-          delivery_address: options.address as any, // Cast to any for Json column
-          delivery_time: options.delivery_time as any, // Cast to any for Json column
+          items: orderSummary as any,
+          delivery_address: options.address as any,
+          delivery_time: options.delivery_time as any,
           special_instructions: options.special_instructions,
           payment_method: paymentDetails.payment_method
         })
@@ -117,7 +118,7 @@ export const checkoutService = {
           .from('user_addresses')
           .upsert({
             user_id: user.id,
-            address: options.address as any, // Cast to any for Json column
+            address: options.address as any,
             is_default: true
           });
           
@@ -157,7 +158,7 @@ export const checkoutService = {
       // In a real app, this would use geocoding to check if the address
       // is within the delivery radius defined in the database
       
-      // For this implementation, we'll check if the province/city is in our delivery zones
+      // For this implementation, we'll check if the governorate is in our delivery zones
       const { data: zones, error } = await supabase
         .from('delivery_zones')
         .select('*');
@@ -166,10 +167,10 @@ export const checkoutService = {
         throw error;
       }
       
-      // Check if the address city or province matches any delivery zone
+      // Check if the address governorate matches any delivery zone
       const isInDeliveryZone = zones.some(zone => 
-        zone.city.toLowerCase() === address.city?.toLowerCase() ||
-        zone.province.toLowerCase() === address.province?.toLowerCase()
+        zone.city.toLowerCase() === address.governorate?.toLowerCase() ||
+        zone.province.toLowerCase() === address.governorate?.toLowerCase()
       );
       
       return {
@@ -208,44 +209,6 @@ export const checkoutService = {
     ];
     
     return { dates, timeSlots };
-  },
-  
-  /**
-   * Save user address
-   */
-  async saveUserAddress(address: CheckoutAddress) {
-    try {
-      const user = (await supabase.auth.getUser()).data.user;
-      
-      if (!user) {
-        throw new Error('User must be logged in to save address');
-      }
-      
-      const { data, error } = await supabase
-        .from('user_addresses')
-        .insert({
-          user_id: user.id,
-          address: address as any, // Cast to any for Json column
-          is_default: address.is_default || false
-        })
-        .select()
-        .single();
-        
-      if (error) {
-        throw error;
-      }
-      
-      return {
-        success: true,
-        addressId: data.id
-      };
-    } catch (error) {
-      console.error('Error saving address:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Error saving address'
-      };
-    }
   },
   
   /**
@@ -304,7 +267,7 @@ export const checkoutService = {
         .from('user_addresses')
         .insert({
           user_id: user.id,
-          address: addressData as any, // Cast to any for Json column
+          address: addressData as any,
           is_default: addressData.is_default || false
         })
         .select()
@@ -350,7 +313,7 @@ export const checkoutService = {
       const { error } = await supabase
         .from('user_addresses')
         .update({
-          address: addressData as any, // Cast to any for Json column
+          address: addressData as any,
           is_default: addressData.is_default || false,
           updated_at: new Date().toISOString()
         })

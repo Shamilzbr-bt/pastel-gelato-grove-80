@@ -31,34 +31,38 @@ import {
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { CheckCircle, Search, Plus, MapPin, Edit, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { 
+  MapPin, 
+  Plus, 
+  Edit, 
+  Trash2,
+  Search
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export default function DeliveryZones() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
-  const [isAddZoneDialogOpen, setIsAddZoneDialogOpen] = useState(false);
-  const [isEditZoneDialogOpen, setIsEditZoneDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedZone, setSelectedZone] = useState<any>(null);
-
-  // Form state
   const [formData, setFormData] = useState({
     city: '',
     province: '',
-    radius_km: 10,
+    radius_km: 0,
     is_active: true
   });
   
-  // Get all delivery zones
-  const { data: zones, isLoading } = useQuery({
+  // Fetch delivery zones
+  const { data: zonesData, isLoading } = useQuery({
     queryKey: ['deliveryZones'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('delivery_zones')
         .select('*')
-        .order('province', { ascending: true })
-        .order('city', { ascending: true });
+        .order('province');
         
       if (error) {
         throw error;
@@ -68,28 +72,31 @@ export default function DeliveryZones() {
     }
   });
   
-  // Add new zone mutation
+  // Add delivery zone mutation
   const addZoneMutation = useMutation({
     mutationFn: async (zoneData: any) => {
       const { error } = await supabase
         .from('delivery_zones')
         .insert(zoneData);
         
-      if (error) throw error;
-      return true;
+      if (error) {
+        throw error;
+      }
+      
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
-      setIsAddZoneDialogOpen(false);
-      resetForm();
       toast.success('Delivery zone added successfully');
+      setIsAddDialogOpen(false);
+      resetForm();
     },
     onError: (error: any) => {
-      toast.error(`Failed to add zone: ${error.message}`);
+      toast.error(error.message || 'Failed to add delivery zone');
     }
   });
   
-  // Update zone mutation
+  // Update delivery zone mutation
   const updateZoneMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
       const { error } = await supabase
@@ -97,21 +104,24 @@ export default function DeliveryZones() {
         .update(data)
         .eq('id', id);
         
-      if (error) throw error;
-      return true;
+      if (error) {
+        throw error;
+      }
+      
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
-      setIsEditZoneDialogOpen(false);
-      setSelectedZone(null);
       toast.success('Delivery zone updated successfully');
+      setIsEditDialogOpen(false);
+      resetForm();
     },
     onError: (error: any) => {
-      toast.error(`Failed to update zone: ${error.message}`);
+      toast.error(error.message || 'Failed to update delivery zone');
     }
   });
   
-  // Delete zone mutation
+  // Delete delivery zone mutation
   const deleteZoneMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -119,15 +129,43 @@ export default function DeliveryZones() {
         .delete()
         .eq('id', id);
         
-      if (error) throw error;
-      return true;
+      if (error) {
+        throw error;
+      }
+      
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
       toast.success('Delivery zone deleted successfully');
+      setIsDeleteDialogOpen(false);
+      setSelectedZone(null);
     },
     onError: (error: any) => {
-      toast.error(`Failed to delete zone: ${error.message}`);
+      toast.error(error.message || 'Failed to delete delivery zone');
+    }
+  });
+  
+  // Toggle zone active status mutation
+  const toggleZoneStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const { error } = await supabase
+        .from('delivery_zones')
+        .update({ is_active: isActive })
+        .eq('id', id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      return { success: true };
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
+      toast.success(`Delivery zone ${variables.isActive ? 'activated' : 'deactivated'}`);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update zone status');
     }
   });
   
@@ -137,7 +175,6 @@ export default function DeliveryZones() {
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
-    
     setFormData({
       ...formData,
       [name]: type === 'number' ? parseFloat(value) : value
@@ -155,9 +192,20 @@ export default function DeliveryZones() {
     setFormData({
       city: '',
       province: '',
-      radius_km: 10,
+      radius_km: 0,
       is_active: true
     });
+  };
+  
+  const openEditDialog = (zone: any) => {
+    setSelectedZone(zone);
+    setFormData({
+      city: zone.city,
+      province: zone.province,
+      radius_km: zone.radius_km || 0,
+      is_active: zone.is_active
+    });
+    setIsEditDialogOpen(true);
   };
   
   const handleAddZone = (e: React.FormEvent) => {
@@ -165,7 +213,7 @@ export default function DeliveryZones() {
     addZoneMutation.mutate(formData);
   };
   
-  const handleEditZone = (e: React.FormEvent) => {
+  const handleUpdateZone = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedZone) {
       updateZoneMutation.mutate({
@@ -175,28 +223,24 @@ export default function DeliveryZones() {
     }
   };
   
-  const handleDeleteZone = (id: string) => {
-    if (confirm('Are you sure you want to delete this delivery zone?')) {
-      deleteZoneMutation.mutate(id);
+  const handleDeleteZone = () => {
+    if (selectedZone) {
+      deleteZoneMutation.mutate(selectedZone.id);
     }
   };
   
-  const openEditDialog = (zone: any) => {
-    setSelectedZone(zone);
-    setFormData({
-      city: zone.city,
-      province: zone.province,
-      radius_km: zone.radius_km || 10,
-      is_active: zone.is_active !== false // Default to true if undefined
+  const handleToggleStatus = (id: string, currentStatus: boolean) => {
+    toggleZoneStatusMutation.mutate({
+      id,
+      isActive: !currentStatus
     });
-    setIsEditZoneDialogOpen(true);
   };
   
   // Filter zones based on search term
-  const filteredZones = zones?.filter(zone => 
+  const filteredZones = zonesData?.filter(zone => 
     zone.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
     zone.province.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) || [];
   
   return (
     <div className="min-h-screen bg-white">
@@ -214,20 +258,20 @@ export default function DeliveryZones() {
           </span>
           <h1 className="text-4xl sm:text-5xl font-bold font-gelatico mb-2">Delivery Zones</h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Manage where your ice cream can be delivered
+            Manage where you deliver your ice cream
           </p>
         </motion.div>
         
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <CardTitle>Delivery Zones</CardTitle>
-                  <CardDescription>Manage locations where you deliver ice cream</CardDescription>
+                  <CardDescription>Set the areas where your ice cream shop delivers</CardDescription>
                 </div>
-                <Button onClick={() => setIsAddZoneDialogOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
+                <Button onClick={() => setIsAddDialogOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
                   Add Zone
                 </Button>
               </div>
@@ -250,12 +294,22 @@ export default function DeliveryZones() {
                 <div className="flex items-center justify-center p-12">
                   <div className="w-8 h-8 border-4 border-gelatico-pink rounded-full border-t-transparent animate-spin"></div>
                 </div>
-              ) : filteredZones && filteredZones.length > 0 ? (
+              ) : filteredZones.length === 0 ? (
+                <div className="text-center py-12">
+                  <MapPin size={48} className="mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-medium mb-2">No delivery zones</h3>
+                  <p className="text-muted-foreground mb-6">Add a new delivery zone to get started.</p>
+                  <Button onClick={() => setIsAddDialogOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Delivery Zone
+                  </Button>
+                </div>
+              ) : (
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Province</TableHead>
+                        <TableHead>Province/Governorate</TableHead>
                         <TableHead>City</TableHead>
                         <TableHead>Radius (km)</TableHead>
                         <TableHead>Status</TableHead>
@@ -267,31 +321,35 @@ export default function DeliveryZones() {
                         <TableRow key={zone.id}>
                           <TableCell className="font-medium">{zone.province}</TableCell>
                           <TableCell>{zone.city}</TableCell>
-                          <TableCell>{zone.radius_km || 'Not specified'}</TableCell>
+                          <TableCell>{zone.radius_km || 'N/A'}</TableCell>
                           <TableCell>
-                            {zone.is_active !== false ? (
-                              <div className="flex items-center text-green-600">
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                <span>Active</span>
-                              </div>
-                            ) : (
-                              <span className="text-gray-400">Inactive</span>
-                            )}
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                checked={zone.is_active}
+                                onCheckedChange={() => handleToggleStatus(zone.id, zone.is_active)}
+                              />
+                              <span className={zone.is_active ? 'text-green-600' : 'text-gray-500'}>
+                                {zone.is_active ? 'Active' : 'Inactive'}
+                              </span>
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
+                            <div className="flex justify-end space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => openEditDialog(zone)}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
+                              <Button
+                                variant="ghost"
+                                size="icon"
                                 className="text-red-600"
-                                onClick={() => handleDeleteZone(zone.id)}
+                                onClick={() => {
+                                  setSelectedZone(zone);
+                                  setIsDeleteDialogOpen(true);
+                                }}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -302,20 +360,6 @@ export default function DeliveryZones() {
                     </TableBody>
                   </Table>
                 </div>
-              ) : (
-                <div className="text-center py-12">
-                  <MapPin className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg font-medium mb-2">No delivery zones found</p>
-                  <p className="text-muted-foreground mb-6">
-                    {searchTerm ? 'Try a different search term' : 'Add your first delivery zone to get started'}
-                  </p>
-                  {!searchTerm && (
-                    <Button onClick={() => setIsAddZoneDialogOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Zone
-                    </Button>
-                  )}
-                </div>
               )}
             </CardContent>
           </Card>
@@ -323,26 +367,26 @@ export default function DeliveryZones() {
       </div>
       
       {/* Add Zone Dialog */}
-      <Dialog open={isAddZoneDialogOpen} onOpenChange={setIsAddZoneDialogOpen}>
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Delivery Zone</DialogTitle>
             <DialogDescription>
-              Add a new location where you can deliver ice cream
+              Add a new area where your ice cream shop delivers.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddZone}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="province" className="text-right">
-                  Province
+                  Province/Governorate
                 </Label>
                 <Input
                   id="province"
                   name="province"
+                  className="col-span-3"
                   value={formData.province}
                   onChange={handleInputChange}
-                  className="col-span-3"
                   required
                 />
               </div>
@@ -353,9 +397,9 @@ export default function DeliveryZones() {
                 <Input
                   id="city"
                   name="city"
+                  className="col-span-3"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="col-span-3"
                   required
                 />
               </div>
@@ -367,69 +411,63 @@ export default function DeliveryZones() {
                   id="radius_km"
                   name="radius_km"
                   type="number"
-                  min="1"
-                  step="0.1"
+                  className="col-span-3"
                   value={formData.radius_km}
                   onChange={handleInputChange}
-                  className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="is_active" className="text-right">
                   Active
                 </Label>
-                <div className="flex items-center space-x-2 col-span-3">
+                <div className="col-span-3 flex items-center space-x-2">
                   <Switch
                     id="is_active"
                     checked={formData.is_active}
                     onCheckedChange={handleSwitchChange}
                   />
-                  <Label htmlFor="is_active">
-                    {formData.is_active ? 'Active' : 'Inactive'}
-                  </Label>
+                  <span>{formData.is_active ? 'Yes' : 'No'}</span>
                 </div>
               </div>
             </div>
             <DialogFooter>
               <Button 
-                type="button"
-                variant="outline"
+                type="button" 
+                variant="outline" 
                 onClick={() => {
+                  setIsAddDialogOpen(false);
                   resetForm();
-                  setIsAddZoneDialogOpen(false);
                 }}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={addZoneMutation.isPending}>
-                {addZoneMutation.isPending ? 'Adding...' : 'Add Zone'}
-              </Button>
+              <Button type="submit">Add Zone</Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
       
       {/* Edit Zone Dialog */}
-      <Dialog open={isEditZoneDialogOpen} onOpenChange={setIsEditZoneDialogOpen}>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Delivery Zone</DialogTitle>
             <DialogDescription>
-              Update delivery zone details
+              Update the delivery zone details.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleEditZone}>
+          <form onSubmit={handleUpdateZone}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="edit-province" className="text-right">
-                  Province
+                  Province/Governorate
                 </Label>
                 <Input
                   id="edit-province"
                   name="province"
+                  className="col-span-3"
                   value={formData.province}
                   onChange={handleInputChange}
-                  className="col-span-3"
                   required
                 />
               </div>
@@ -440,59 +478,80 @@ export default function DeliveryZones() {
                 <Input
                   id="edit-city"
                   name="city"
+                  className="col-span-3"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="col-span-3"
                   required
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-radius_km" className="text-right">
+                <Label htmlFor="edit-radius" className="text-right">
                   Radius (km)
                 </Label>
                 <Input
-                  id="edit-radius_km"
+                  id="edit-radius"
                   name="radius_km"
                   type="number"
-                  min="1"
-                  step="0.1"
+                  className="col-span-3"
                   value={formData.radius_km}
                   onChange={handleInputChange}
-                  className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="edit-is_active" className="text-right">
+                <Label htmlFor="edit-active" className="text-right">
                   Active
                 </Label>
-                <div className="flex items-center space-x-2 col-span-3">
+                <div className="col-span-3 flex items-center space-x-2">
                   <Switch
-                    id="edit-is_active"
+                    id="edit-active"
                     checked={formData.is_active}
                     onCheckedChange={handleSwitchChange}
                   />
-                  <Label htmlFor="edit-is_active">
-                    {formData.is_active ? 'Active' : 'Inactive'}
-                  </Label>
+                  <span>{formData.is_active ? 'Yes' : 'No'}</span>
                 </div>
               </div>
             </div>
             <DialogFooter>
               <Button 
-                type="button"
-                variant="outline"
+                type="button" 
+                variant="outline" 
                 onClick={() => {
-                  setSelectedZone(null);
-                  setIsEditZoneDialogOpen(false);
+                  setIsEditDialogOpen(false);
+                  resetForm();
                 }}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={updateZoneMutation.isPending}>
-                {updateZoneMutation.isPending ? 'Updating...' : 'Save Changes'}
-              </Button>
+              <Button type="submit">Save Changes</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Zone Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Delivery Zone</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this delivery zone? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteZone}
+            >
+              Delete Zone
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       

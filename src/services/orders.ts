@@ -41,7 +41,7 @@ export const ordersService = {
   /**
    * Get a specific order by ID
    */
-  async getOrderById(orderId) {
+  async getOrderById(orderId: string) {
     try {
       const user = (await supabase.auth.getUser()).data.user;
       
@@ -68,7 +68,8 @@ export const ordersService = {
         tax: data.tax || 0,
         payment_status: data.payment_status || (data.status === 'cancelled' ? 'cancelled' : 'paid'),
         shipping_address: data.delivery_address,
-        expected_delivery: data.expected_delivery || new Date(new Date(data.created_at).getTime() + 86400000 * 2).toISOString(),
+        expected_delivery: data.expected_delivery || 
+          new Date(new Date(data.created_at).getTime() + 86400000 * 2).toISOString(),
         delivery_instructions: data.special_instructions,
       };
       

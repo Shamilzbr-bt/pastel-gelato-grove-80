@@ -10,8 +10,20 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapPin, Plus, Pencil, Trash2, Home, Building, Check } from 'lucide-react';
 import { toast } from 'sonner';
+
+// Kuwait governorates
+const GOVERNORATES = [
+  'Al Asimah',
+  'Hawalli',
+  'Al Farwaniyah',
+  'Mubarak Al-Kabeer',
+  'Al Ahmadi',
+  'Al Jahra',
+  'Kuwait City'
+];
 
 export default function SavedAddresses() {
   const [isAddAddressDialogOpen, setIsAddAddressDialogOpen] = useState(false);
@@ -81,12 +93,13 @@ export default function SavedAddresses() {
     const addressData = {
       first_name: formData.get('first_name') as string,
       last_name: formData.get('last_name') as string,
-      address1: formData.get('address1') as string,
-      address2: formData.get('address2') as string || '',
-      city: formData.get('city') as string,
-      province: formData.get('province') as string,
-      zip: formData.get('zip') as string,
-      country: formData.get('country') as string,
+      governorate: formData.get('governorate') as string,
+      flat_no: formData.get('flat_no') as string,
+      building_number: formData.get('building_number') as string,
+      block: formData.get('block') as string,
+      street: formData.get('street') as string,
+      avenue: formData.get('avenue') as string || '',
+      paci: formData.get('paci') as string || '',
       phone: formData.get('phone') as string,
       is_default: formData.get('is_default') === 'on'
     };
@@ -102,12 +115,13 @@ export default function SavedAddresses() {
       address: {
         first_name: formData.get('first_name') as string,
         last_name: formData.get('last_name') as string,
-        address1: formData.get('address1') as string,
-        address2: formData.get('address2') as string || '',
-        city: formData.get('city') as string,
-        province: formData.get('province') as string,
-        zip: formData.get('zip') as string,
-        country: formData.get('country') as string,
+        governorate: formData.get('governorate') as string,
+        flat_no: formData.get('flat_no') as string,
+        building_number: formData.get('building_number') as string,
+        block: formData.get('block') as string,
+        street: formData.get('street') as string,
+        avenue: formData.get('avenue') as string || '',
+        paci: formData.get('paci') as string || '',
         phone: formData.get('phone') as string,
         is_default: formData.get('is_default') === 'on'
       }
@@ -124,6 +138,22 @@ export default function SavedAddresses() {
   
   const handleSetDefaultAddress = (addressId: string) => {
     setDefaultAddressMutation.mutate(addressId);
+  };
+  
+  // Format address for display
+  const formatAddress = (address: any) => {
+    if (!address) return '';
+    
+    let parts = [];
+    
+    if (address.flat_no) parts.push(`Flat ${address.flat_no}`);
+    if (address.building_number) parts.push(`Building ${address.building_number}`);
+    if (address.block) parts.push(`Block ${address.block}`);
+    if (address.street) parts.push(`Street ${address.street}`);
+    if (address.avenue) parts.push(`Avenue ${address.avenue}`);
+    if (address.governorate) parts.push(address.governorate);
+    
+    return parts.join(', ');
   };
   
   const AddressForm = ({ isEdit = false }: { isEdit?: boolean }) => (
@@ -150,62 +180,79 @@ export default function SavedAddresses() {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="address1">Address Line 1</Label>
-        <Input 
-          id="address1" 
-          name="address1" 
-          defaultValue={isEdit ? currentAddress?.address.address1 : ''} 
-          required 
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="address2">Address Line 2 (Optional)</Label>
-        <Input 
-          id="address2" 
-          name="address2" 
-          defaultValue={isEdit ? currentAddress?.address.address2 : ''} 
-        />
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="city">City</Label>
-          <Input 
-            id="city" 
-            name="city" 
-            defaultValue={isEdit ? currentAddress?.address.city : ''} 
-            required 
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="province">Province/State</Label>
-          <Input 
-            id="province" 
-            name="province" 
-            defaultValue={isEdit ? currentAddress?.address.province : ''} 
-            required 
-          />
-        </div>
+        <Label htmlFor="governorate">Governorate</Label>
+        <Select 
+          name="governorate"
+          defaultValue={isEdit ? currentAddress?.address.governorate : undefined}
+        >
+          <SelectTrigger id="governorate">
+            <SelectValue placeholder="Select governorate" />
+          </SelectTrigger>
+          <SelectContent>
+            {GOVERNORATES.map((gov) => (
+              <SelectItem key={gov} value={gov}>{gov}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="zip">Postal/Zip Code</Label>
+          <Label htmlFor="flat_no">Flat No.</Label>
           <Input 
-            id="zip" 
-            name="zip" 
-            defaultValue={isEdit ? currentAddress?.address.zip : ''} 
+            id="flat_no" 
+            name="flat_no" 
+            defaultValue={isEdit ? currentAddress?.address.flat_no : ''} 
             required 
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="country">Country</Label>
+          <Label htmlFor="building_number">Building Number</Label>
           <Input 
-            id="country" 
-            name="country" 
-            defaultValue={isEdit ? currentAddress?.address.country : 'Kuwait'} 
+            id="building_number" 
+            name="building_number" 
+            defaultValue={isEdit ? currentAddress?.address.building_number : ''} 
             required 
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="block">Block</Label>
+          <Input 
+            id="block" 
+            name="block" 
+            defaultValue={isEdit ? currentAddress?.address.block : ''} 
+            required 
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="street">Street</Label>
+          <Input 
+            id="street" 
+            name="street" 
+            defaultValue={isEdit ? currentAddress?.address.street : ''} 
+            required 
+          />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="avenue">Avenue (Optional)</Label>
+          <Input 
+            id="avenue" 
+            name="avenue" 
+            defaultValue={isEdit ? currentAddress?.address.avenue : ''} 
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="paci">PACI (Optional)</Label>
+          <Input 
+            id="paci" 
+            name="paci" 
+            defaultValue={isEdit ? currentAddress?.address.paci : ''} 
           />
         </div>
       </div>
@@ -305,12 +352,7 @@ export default function SavedAddresses() {
                       
                       <div className="flex items-start gap-4">
                         <div className="rounded-full p-2 bg-gelatico-baby-pink/20 text-gelatico-pink">
-                          {address.address.address2?.toLowerCase().includes('home') || 
-                           address.address.address2?.toLowerCase().includes('house') ? (
-                            <Home size={20} />
-                          ) : (
-                            <Building size={20} />
-                          )}
+                          {address.address.flat_no ? <Home size={20} /> : <Building size={20} />}
                         </div>
                         
                         <div className="flex-grow">
@@ -318,13 +360,9 @@ export default function SavedAddresses() {
                             {address.address.first_name} {address.address.last_name}
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            {address.address.address1}
-                            {address.address.address2 && `, ${address.address.address2}`}
+                            {formatAddress(address.address)}
                             <br />
-                            {address.address.city}, {address.address.province} {address.address.zip}
-                            <br />
-                            {address.address.country}
-                            {address.address.phone && <><br />Phone: {address.address.phone}</>}
+                            {address.address.phone && <>Phone: {address.address.phone}</>}
                           </p>
                         </div>
                         
