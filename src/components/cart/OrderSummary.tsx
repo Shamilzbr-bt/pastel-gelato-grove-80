@@ -1,6 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 interface OrderSummaryProps {
   subtotal: number;
@@ -51,10 +52,10 @@ export default function OrderSummary({
         </div>
       </div>
       
-      <button
+      <Button
         onClick={handleCheckout}
         disabled={isCheckingOut || cartItemsEmpty}
-        className="gelatico-button w-full flex items-center justify-center"
+        className="w-full flex items-center justify-center"
       >
         {isCheckingOut ? (
           <span className="flex items-center">
@@ -67,7 +68,7 @@ export default function OrderSummary({
             <ArrowRight size={16} className="ml-2" />
           </span>
         )}
-      </button>
+      </Button>
       
       <div className="mt-4">
         <Link 
