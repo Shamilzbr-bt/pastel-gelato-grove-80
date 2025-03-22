@@ -5,11 +5,13 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ShoppingBag } from 'lucide-react';
-import ContainerSelector from '@/components/product/ContainerSelector';
+import ContainerSelector, { ContainerOption } from '@/components/product/ContainerSelector';
 import ToppingsSelector from '@/components/product/ToppingsSelector';
 import { Flavor } from '@/models/Flavor';
 import { isSorbet } from '@/models/Flavor';
 import { toast } from "sonner";
+import { useCart } from '@/hooks/useCart';
+import { getDemoProducts } from '@/data/products';
 
 type ProductPageParams = {
   id: string;
@@ -17,13 +19,72 @@ type ProductPageParams = {
 };
 
 export default function Product() {
-  const [selectedContainer, setSelectedContainer] = useState('cup');
+  const [selectedContainer, setSelectedContainer] = useState('cup-minio');
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
   const [flavor, setFlavor] = useState<Flavor | null>(null);
+  const [product, setProduct] = useState<any | null>(null);
   const { id } = useParams<ProductPageParams>();
   const navigate = useNavigate();
+  const { addItem } = useCart();
+
+  // Get container options information
+  const getSelectedContainerInfo = () => {
+    const containerOptions: ContainerOption[] = [
+      { id: 'cup-minio', type: 'cup', size: 'minio', name: 'Minio Cup', price: 1.600, description: 'Single scoop cup' },
+      { id: 'cup-medio', type: 'cup', size: 'medio', name: 'Medio Cup', price: 1.950, description: 'Double scoop cup' },
+      { id: 'cup-megano', type: 'cup', size: 'megano', name: 'Megano Cup', price: 2.350, description: 'Triple scoop cup' },
+      { id: 'cone-standard', type: 'cone', size: 'standard', name: 'Standard Cone', price: 1.350, description: 'Single scoop cone' },
+      { id: 'cone-tower', type: 'cone', size: 'tower', name: 'Mega Cone', price: 1.950, description: 'Double scoop cone' },
+    ];
+    
+    return containerOptions.find(opt => opt.id === selectedContainer);
+  };
+
+  // Get toppings information
+  const getSelectedToppingsInfo = () => {
+    const toppings = [
+      { id: 'marshmallow', name: 'Marshmallow', price: 0.400, category: 'addons' },
+      { id: 'oreo', name: 'Oreo Crumbs', price: 0.400, category: 'addons' },
+      { id: 'sprinkles', name: 'Sprinkles', price: 0.400, category: 'addons' },
+      { id: 'nuts', name: 'Mixed Nuts', price: 0.400, category: 'addons' },
+      { id: 'brownies', name: 'Brownie Pieces', price: 0.400, category: 'addons' },
+      { id: 'chocolate', name: 'Chocolate Sauce', price: 0.350, category: 'sauces' },
+      { id: 'caramel', name: 'Caramel Sauce', price: 0.350, category: 'sauces' },
+      { id: 'pistachio', name: 'Pistachio Sauce', price: 0.350, category: 'sauces' },
+      { id: 'strawberry', name: 'Strawberry Sauce', price: 0.350, category: 'sauces' },
+      { id: 'honey', name: 'Honey', price: 0.350, category: 'sauces' },
+    ];
+    
+    return selectedToppings.map(id => toppings.find(t => t.id === id)).filter(Boolean);
+  };
+
+  // Calculate total price based on container and toppings
+  const calculateTotalPrice = () => {
+    const containerInfo = getSelectedContainerInfo();
+    const toppingsInfo = getSelectedToppingsInfo();
+    
+    const basePrice = (product?.variants?.[0]?.price ? parseFloat(product.variants[0].price) : 0) || 
+                     (flavor?.price ? (typeof flavor.price === 'string' ? parseFloat(flavor.price) : flavor.price) : 0);
+    
+    const containerPrice = containerInfo?.price || 0;
+    const toppingsPrice = toppingsInfo.reduce((total, topping) => total + (topping?.price || 0), 0);
+    
+    return basePrice + containerPrice + toppingsPrice;
+  };
 
   useEffect(() => {
+    if (!id) return;
+
+    // Try to find the item as a product first
+    const products = getDemoProducts();
+    const foundProduct = products.find(p => p.id === id);
+    
+    if (foundProduct) {
+      setProduct(foundProduct);
+      return;
+    }
+
+    // If not a product, try as a flavor
     const mockedFlavors: Flavor[] = [
       {
         id: "coconutty",
@@ -235,23 +296,62 @@ export default function Product() {
     if (foundFlavor) {
       setFlavor(foundFlavor);
     } else {
-      toast.error("Flavor not found!");
-      navigate('/flavors');
+      toast.error("Product not found!");
+      navigate('/shop');
     }
   }, [id, navigate]);
 
   const handleAddToCart = () => {
-    if (!flavor) {
-      toast.error("Flavor details not loaded yet.");
+    const itemToAdd = product || flavor;
+    
+    if (!itemToAdd) {
+      toast.error("Product details not loaded yet.");
       return;
     }
 
-    toast.success(`${flavor.name} added to cart with ${selectedContainer} and toppings: ${selectedToppings.join(', ')}`);
+    const containerInfo = getSelectedContainerInfo();
+    const toppingsInfo = getSelectedToppingsInfo();
+    
+    // Get the container name and toppings names for display
+    const containerName = containerInfo?.name || "";
+    const toppingNames = toppingsInfo.map(t => t?.name).join(', ');
+    
+    // Calculate actual price with add-ons
+    const totalPrice = calculateTotalPrice().toFixed(3);
+    
+    // Create a unique variant ID that includes customizations
+    const customizationSuffix = `${selectedContainer}-${selectedToppings.join('-')}`;
+    const customVariantId = `${itemToAdd.id || itemToAdd.variants?.[0]?.id}-${customizationSuffix}`;
+    
+    addItem({
+      variantId: customVariantId,
+      quantity: 1,
+      title: itemToAdd.title || itemToAdd.name,
+      price: totalPrice, // Use calculated price that includes container and toppings
+      image: itemToAdd.images?.[0]?.src || itemToAdd.image,
+      variantTitle: containerName,
+      customizations: {
+        container: containerInfo,
+        toppings: toppingsInfo,
+        toppingNames: toppingNames
+      }
+    });
+
+    toast.success(`${itemToAdd.title || itemToAdd.name} added to cart with ${containerName}${toppingNames ? ' and ' + toppingNames : ''}`);
   };
 
-  if (!flavor) {
+  const displayItem = product || flavor;
+
+  if (!displayItem) {
     return <div>Loading...</div>;
   }
+
+  const itemTitle = product?.title || flavor?.name;
+  const itemDescription = product?.description || flavor?.description;
+  const itemImage = product?.images?.[0]?.src || flavor?.image;
+  const itemCategory = product?.tags?.split(',')?.[0] || (flavor ? (isSorbet(flavor) ? 'Sorbet' : 'Gelato') : '');
+  const backTo = product ? '/shop' : '/flavors';
+  const backLabel = product ? 'Back to Shop' : 'Back to Flavors';
 
   return (
     <div className="min-h-screen bg-white">
@@ -264,9 +364,9 @@ export default function Product() {
         transition={{ duration: 0.5 }}
         className="page-container pt-32"
       >
-        <button onClick={() => navigate('/flavors')} className="mb-4 inline-flex items-center gelatico-button-secondary">
+        <button onClick={() => navigate(backTo)} className="mb-4 inline-flex items-center gelatico-button-secondary">
           <ChevronLeft size={20} className="mr-2" />
-          Back to Flavors
+          {backLabel}
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -277,13 +377,13 @@ export default function Product() {
             className="relative"
           >
             <img 
-              src={flavor.image} 
-              alt={flavor.name} 
+              src={itemImage} 
+              alt={itemTitle} 
               className="rounded-2xl shadow-lg w-full h-auto" 
             />
             <div className="absolute top-3 left-3">
               <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-white/70 backdrop-blur-sm text-gelatico-pink">
-                {isSorbet(flavor) ? 'Sorbet' : 'Gelato'}
+                {itemCategory}
               </span>
             </div>
           </motion.div>
@@ -293,8 +393,8 @@ export default function Product() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl font-bold font-gelatico mb-4">{flavor.name}</h1>
-            <p className="text-muted-foreground mb-6">{flavor.description}</p>
+            <h1 className="text-4xl font-bold font-gelatico mb-4">{itemTitle}</h1>
+            <p className="text-muted-foreground mb-6">{itemDescription}</p>
 
             <div className="mb-6">
               <h3 className="text-xl font-semibold mb-2">Customize Your Order</h3>
@@ -312,7 +412,7 @@ export default function Product() {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-semibold text-gelatico-pink">{flavor.price} KD</span>
+              <span className="text-2xl font-semibold text-gelatico-pink">{calculateTotalPrice().toFixed(3)} KD</span>
               <button 
                 onClick={handleAddToCart}
                 className="gelatico-button inline-flex items-center"

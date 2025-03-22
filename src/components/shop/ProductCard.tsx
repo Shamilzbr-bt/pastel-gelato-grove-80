@@ -1,8 +1,9 @@
 
 import { motion } from 'framer-motion';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Eye } from 'lucide-react';
 import { Product } from '@/pages/Shop';
 import { formatPrice } from '@/utils/formatters';
+import { Link } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -53,13 +54,22 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
             <span className="text-lg font-semibold text-white">
               {formatPrice(parsePrice(product.variants[0]?.price || '0'))}
             </span>
-            <button
-              onClick={() => onAddToCart(product)}
-              className="inline-flex items-center justify-center p-2 rounded-full bg-gelatico-pink text-white hover:bg-gelatico-pink/90 transition-all duration-300"
-              aria-label={`Add ${product.title} to cart`}
-            >
-              <ShoppingBag size={18} />
-            </button>
+            <div className="flex gap-2">
+              <Link
+                to={`/product/${product.id}`}
+                className="inline-flex items-center justify-center p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-300"
+                aria-label={`View ${product.title} details`}
+              >
+                <Eye size={18} />
+              </Link>
+              <button
+                onClick={() => onAddToCart(product)}
+                className="inline-flex items-center justify-center p-2 rounded-full bg-gelatico-pink text-white hover:bg-gelatico-pink/90 transition-all duration-300"
+                aria-label={`Add ${product.title} to cart`}
+              >
+                <ShoppingBag size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </div>

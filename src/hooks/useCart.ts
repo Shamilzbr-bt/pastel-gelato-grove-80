@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { ContainerOption } from "@/components/product/ContainerSelector";
 
 export interface CartItem {
   variantId: string;
@@ -9,6 +10,16 @@ export interface CartItem {
   price?: string;
   image?: string;
   variantTitle?: string;
+  customizations?: {
+    container?: ContainerOption;
+    toppings?: Array<{
+      id: string;
+      name: string;
+      price: number;
+      category: string;
+    }>;
+    toppingNames?: string;
+  };
 }
 
 export function useCart() {

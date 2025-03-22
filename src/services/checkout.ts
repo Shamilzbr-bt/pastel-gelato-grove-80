@@ -1,14 +1,6 @@
 
 import { toast } from "sonner";
-
-export interface CartItem {
-  variantId: string;
-  quantity: number;
-  title?: string;
-  price?: string;
-  image?: string;
-  variantTitle?: string;
-}
+import { CartItem } from "@/hooks/useCart";
 
 export interface CheckoutAddress {
   first_name?: string;
@@ -52,6 +44,20 @@ export const checkoutService = {
 
       console.log(`Total order amount: ${totalAmount}`);
       
+      // Generate a formatted order summary
+      const orderSummary = items.map(item => {
+        return {
+          title: item.title,
+          quantity: item.quantity,
+          price: item.price,
+          container: item.customizations?.container?.name,
+          toppings: item.customizations?.toppingNames,
+          total: (parseFloat(item.price || "0") * item.quantity).toFixed(3)
+        };
+      });
+      
+      console.log('Order summary:', orderSummary);
+      
       // In a real application, you would:
       // 1. Save the order to a database
       // 2. Process payment through a payment gateway
@@ -65,6 +71,7 @@ export const checkoutService = {
         success: true,
         orderId,
         totalAmount,
+        orderSummary,
         message: 'Order processed successfully'
       };
     } catch (error) {
