@@ -14,37 +14,37 @@ const Index = () => {
   const [featuredFlavors, setFeaturedFlavors] = useState<Flavor[]>([]);
 
   useEffect(() => {
-    // Mock data for featured flavors
+    // Mock data for featured flavors with new images
     const mockFlavors: Flavor[] = [
       {
         id: "coconutty",
         name: "Coconutty Gelato",
         description: "Creamy coconut gelato with toasted coconut flakes.",
-        image: "/lovable-uploads/08ff6f2d-b912-4096-9a20-d31d7c5dc7ea.png",
+        image: "/lovable-uploads/d520fc48-b67a-4391-bbce-95a3f93c8450.png",
         tags: ["Gelato", "Coconut"],
         featured: true,
         price: "1.900",
         variants: [{ id: "coconutty-regular", name: "Regular", price: "1.900" }]
       },
       {
-        id: "bubblegum",
-        name: "Bubblegum Gelato",
-        description: "Classic bubblegum flavored gelato that's fun for all ages.",
-        image: "/lovable-uploads/68fdfc78-f84f-4411-b18a-ab7ce14b9128.png",
-        tags: ["Gelato", "Bubblegum"],
+        id: "pistacchio",
+        name: "Pistachio Delight",
+        description: "Authentic pistachio gelato made from premium Italian nuts.",
+        image: "/lovable-uploads/3e7425e2-b89a-494a-ad3c-654d86a90ec6.png",
+        tags: ["Gelato", "Pistachio", "Nuts"],
         featured: true,
         price: "1.900",
-        variants: [{ id: "bubblegum-regular", name: "Regular", price: "1.900" }]
+        variants: [{ id: "pistachio-regular", name: "Regular", price: "1.900" }]
       },
       {
-        id: "oreo",
-        name: "Oreo Gelato",
-        description: "Delicious cookies and cream gelato with real Oreo pieces.",
-        image: "/lovable-uploads/6bc2aabc-0a5a-4554-a821-4dd77f9c8aea.png",
-        tags: ["Gelato", "Oreo"],
+        id: "chocolate",
+        name: "Double Chocolate",
+        description: "Rich dark chocolate gelato with chocolate chunks.",
+        image: "/lovable-uploads/5711393c-4796-46a9-a939-478166f02cbf.png",
+        tags: ["Gelato", "Chocolate"],
         featured: true,
         price: "1.900",
-        variants: [{ id: "oreo-regular", name: "Regular", price: "1.900" }]
+        variants: [{ id: "chocolate-regular", name: "Regular", price: "1.900" }]
       }
     ];
 

@@ -41,7 +41,8 @@ export default function FlavorImage({ image, name, tags, layout = 'grid' }: Flav
         transition={{ duration: 0.5 }}
         onError={(e) => {
           const target = e.target as HTMLImageElement;
-          target.src = 'https://placehold.co/800x600/e81cff/ffffff?text=Missing+Image';
+          console.log(`Failed to load image: ${image}`);
+          target.src = '/lovable-uploads/ee7dd54f-f5d1-41fb-9c95-21e2916f3ee7.png';
         }}
       />
       

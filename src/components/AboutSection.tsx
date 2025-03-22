@@ -53,8 +53,8 @@ export default function AboutSection() {
           <motion.div variants={itemVariants} className="relative">
             <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-soft">
               <img
-                src="/lovable-uploads/8c0b7de9-45c2-43dc-9af9-84cc4d9f768f.png"
-                alt="Artisanal gelato cone"
+                src="/lovable-uploads/47544c31-489b-43d9-bea9-70fb1cc17910.png"
+                alt="Artisanal gelato box"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -66,8 +66,8 @@ export default function AboutSection() {
             {/* Small cone decoration */}
             <div className="absolute bottom-[-30px] left-[-20px] w-24 h-24 z-10">
               <img 
-                src="/lovable-uploads/c80c3756-ab46-4f52-8c9f-5331b5964be1.png" 
-                alt="Decorative cone" 
+                src="/lovable-uploads/ebbb6106-1761-4374-8ba5-846c648acc22.png" 
+                alt="Decorative gelato cone" 
                 className="w-full h-full object-contain"
               />
             </div>

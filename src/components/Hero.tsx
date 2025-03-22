@@ -8,19 +8,19 @@ export default function Hero() {
   
   const slides = [
     {
-      image: "/lovable-uploads/595cde14-035d-422a-a7f0-6c77c7a1370c.png",
+      image: "/lovable-uploads/4af656c2-e89f-41a0-adc6-f25a01e26357.png",
       subheading: "Handcrafted with Love",
       heading: "Artisanal Gelato",
       description: "Experience the authentic taste of Italy with our premium, small-batch gelato made from the finest ingredients."
     },
     {
-      image: "/lovable-uploads/87089c2c-b9dc-4fd2-8479-a5af0a12ba4e.png",
+      image: "/lovable-uploads/41ee38fc-d609-4bca-8254-2e89a01757e4.png",
       subheading: "New Season Flavors",
       heading: "Summer Collection",
       description: "Discover our refreshing seasonal flavors, crafted to bring joy to those hot summer days."
     },
     {
-      image: "/lovable-uploads/90da045e-8c11-4f07-9d5c-647f8ae7bd49.png",
+      image: "/lovable-uploads/953efacf-8ef3-4edb-8ab0-a1e7142e9b9e.png",
       subheading: "Pure Indulgence",
       heading: "Exquisite Taste",
       description: "Savor the moment with our rich, creamy gelato - an experience that transcends ordinary ice cream."

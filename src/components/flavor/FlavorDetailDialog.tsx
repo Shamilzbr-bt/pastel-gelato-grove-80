@@ -14,13 +14,26 @@ interface FlavorDetailDialogProps {
 }
 
 export default function FlavorDetailDialog({ flavor, onAddToCart }: FlavorDetailDialogProps) {
+  // Function to clean image path
+  const cleanImagePath = (path: string) => {
+    // Remove /public prefix if it exists
+    if (path.startsWith('/public/')) {
+      return path.substring(7);
+    }
+    return path;
+  };
+  
   return (
     <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
       <div className="relative aspect-video">
         <img 
-          src={flavor.image} 
+          src={cleanImagePath(flavor.image)} 
           alt={flavor.name} 
           className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = '/lovable-uploads/67ee37cc-aeb4-47ed-a49a-f40b0216fac1.png';
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
           <div className="p-6">
