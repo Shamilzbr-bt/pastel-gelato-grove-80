@@ -14,6 +14,12 @@ interface FlavorImageProps {
 export default function FlavorImage({ image, name, tags, layout = 'grid' }: FlavorImageProps) {
   const [isHovered, setIsHovered] = useState(false);
   
+  // Function to clean image path
+  const cleanImagePath = (path: string) => {
+    // Remove /public prefix if it exists
+    return path.startsWith('/public/') ? path.substring(7) : path;
+  };
+  
   return (
     <div 
       className={cn(
@@ -24,7 +30,7 @@ export default function FlavorImage({ image, name, tags, layout = 'grid' }: Flav
       onMouseLeave={() => setIsHovered(false)}
     >
       <motion.img
-        src={image}
+        src={cleanImagePath(image)}
         alt={name}
         className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
         initial={false}
