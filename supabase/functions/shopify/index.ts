@@ -35,6 +35,7 @@ serve(async (req) => {
     // Route the request based on the action
     switch (action) {
       case 'getProducts':
+        console.log('Fetching products from Shopify');
         const productsResponse = await fetch(`${baseUrl}/products.json`, {
           method: 'GET',
           headers,
@@ -47,10 +48,12 @@ serve(async (req) => {
         }
         
         result = await productsResponse.json();
+        console.log(`Successfully fetched ${result.products?.length || 0} products`);
         break;
 
       case 'getProduct':
         const { productId } = data;
+        console.log(`Fetching product with ID: ${productId}`);
         const productResponse = await fetch(`${baseUrl}/products/${productId}.json`, {
           method: 'GET',
           headers,
@@ -63,10 +66,12 @@ serve(async (req) => {
         }
         
         result = await productResponse.json();
+        console.log('Successfully fetched product:', result.product?.title);
         break;
 
       case 'createCheckout':
-        const { items } = data;
+        const { items, email, address } = data;
+        console.log('Creating checkout with items:', items);
         
         // Create a checkout instead of a draft order for better user experience
         const checkoutResponse = await fetch(`${baseUrl}/checkouts.json`, {
@@ -78,8 +83,8 @@ serve(async (req) => {
                 variant_id: item.variantId,
                 quantity: item.quantity
               })),
-              email: data.email || '',
-              shipping_address: data.address || {}
+              email: email || '',
+              shipping_address: address || {}
             }
           })
         });
@@ -96,6 +101,7 @@ serve(async (req) => {
         // Generate the checkout web URL
         if (checkoutData.checkout && checkoutData.checkout.token) {
           checkoutData.checkout_url = `https://${SHOPIFY_STORE_URL}/checkout/${checkoutData.checkout.token}`;
+          console.log('Checkout URL created:', checkoutData.checkout_url);
         }
         
         result = checkoutData;

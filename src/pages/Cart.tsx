@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -36,18 +35,10 @@ export default function Cart() {
       const response = await shopifyService.createCheckout(cartItems);
       
       if (response.success && response.checkoutUrl) {
-        // For a real implementation, redirect to the Shopify checkout URL
-        toast.success("Redirecting to checkout...");
+        toast.success("Redirecting to secure checkout...");
         
-        // In a production app, you'd redirect to the checkout URL:
-        // window.location.href = response.checkoutUrl;
-        
-        // For this demo, we'll just clear the cart and show a success message
-        setTimeout(() => {
-          setCartItems([]);
-          toast.success("Order placed successfully!");
-          navigate('/shop');
-        }, 1500);
+        // Redirect to Shopify checkout
+        window.location.href = response.checkoutUrl;
       } else if (!response.success) {
         toast.error(response.error || "There was a problem processing your order");
       }
@@ -60,7 +51,7 @@ export default function Cart() {
   };
   
   const subtotal = calculateSubtotal();
-  const shippingFee = subtotal >= 50 ? 0 : 5.99;
+  const shippingFee = subtotal >= 15 ? 0 : 2;
   const total = subtotal + shippingFee;
 
   return (
