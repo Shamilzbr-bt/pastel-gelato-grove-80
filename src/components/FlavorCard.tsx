@@ -39,60 +39,65 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
       onMouseLeave={() => setIsHovered(false)}
     >
       <Link 
-        to={`/flavors/${flavor.id}`} 
-        className={cn("block h-full", layout === 'grid' ? "uiverse-card" : "")}
+        to={`/flavors/${flavor.id}`}
+        className="block h-full w-full"
         onClick={(e) => e.stopPropagation()}
       >
-        <FlavorImage 
-          image={flavor.image}
-          name={flavor.name}
-          tags={flavor.tags}
-          layout={layout}
-        />
-        
         <div className={cn(
-          "p-4",
-          layout === 'featured' && "md:flex-1"
+          "card",
+          layout === 'grid' ? "h-full w-full" : ""
         )}>
-          <h3 className="heading text-xl font-bold font-gelatico mb-2 group-hover:text-gelatico-pink transition-colors duration-300">
-            {flavor.name}
-          </h3>
+          <FlavorImage 
+            image={flavor.image}
+            name={flavor.name}
+            tags={flavor.tags}
+            layout={layout}
+          />
           
-          <p className="text-muted-foreground mb-3 line-clamp-2">
-            {flavor.description}
-          </p>
-          
-          <div className="flex items-center justify-between mt-4">
-            <span className="text-lg font-semibold text-foreground">
-              {formatPrice(flavor.price || 0)}
-            </span>
+          <div className={cn(
+            "p-4",
+            layout === 'featured' && "md:flex-1"
+          )}>
+            <h3 className="heading text-xl font-bold font-gelatico mb-2 group-hover:text-gelatico-pink transition-colors duration-300">
+              {flavor.name}
+            </h3>
             
-            <div className="flex items-center space-x-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="rounded-full border-gelatico-pink text-gelatico-pink hover:bg-gelatico-baby-pink hover:bg-opacity-20"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    <Info size={18} />
-                  </Button>
-                </DialogTrigger>
-                <FlavorDetailDialog 
-                  flavor={flavor}
-                  onAddToCart={handleAddToCart}
-                />
-              </Dialog>
+            <p className="text-white mb-3 line-clamp-2">
+              {flavor.description}
+            </p>
+            
+            <div className="flex items-center justify-between mt-4">
+              <span className="text-lg font-semibold text-white">
+                {formatPrice(flavor.price || 0)}
+              </span>
               
-              <Button 
-                variant="default" 
-                size="icon" 
-                className="rounded-full bg-gelatico-pink hover:bg-gelatico-pink/90 text-white"
-                onClick={handleAddToCart}
-              >
-                <ShoppingBag size={18} />
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="rounded-full border-gelatico-pink text-gelatico-pink hover:bg-gelatico-baby-pink hover:bg-opacity-20"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      <Info size={18} />
+                    </Button>
+                  </DialogTrigger>
+                  <FlavorDetailDialog 
+                    flavor={flavor}
+                    onAddToCart={handleAddToCart}
+                  />
+                </Dialog>
+                
+                <Button 
+                  variant="default" 
+                  size="icon" 
+                  className="rounded-full bg-gelatico-pink hover:bg-gelatico-pink/90 text-white"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingBag size={18} />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -30,6 +30,10 @@ export default function FlavorImage({ image, name, tags, layout = 'grid' }: Flav
         initial={false}
         animate={{ scale: isHovered ? 1.1 : 1 }}
         transition={{ duration: 0.5 }}
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.src = 'https://placehold.co/800x600/e81cff/ffffff?text=Missing+Image';
+        }}
       />
       
       {/* Tags overlay */}
