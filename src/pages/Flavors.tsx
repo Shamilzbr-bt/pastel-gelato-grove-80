@@ -15,7 +15,7 @@ export default function Flavors() {
     const mappedFlavors: Flavor[] = flavorImages.map(flavor => ({
       id: flavor.id,
       name: flavor.title,
-      description: `Premium ${flavor.title.toLowerCase().includes('sorbet') ? 'Italian sorbet' : 'Italian gelato'} made with the finest ingredients.`,
+      description: flavor.description || `Premium ${flavor.title.toLowerCase().includes('sorbet') ? 'Italian sorbet' : 'Italian gelato'} made with the finest ingredients.`,
       image: flavor.image,
       tags: [flavor.tags],
       price: parseFloat(flavor.price),
