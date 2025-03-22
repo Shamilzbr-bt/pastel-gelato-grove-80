@@ -11,8 +11,12 @@ export default function Flavors() {
   const [flavors, setFlavors] = useState<Flavor[]>([]);
 
   useEffect(() => {
-    // Convert flavorImages to Flavor[]
-    const mappedFlavors: Flavor[] = flavorImages.map(flavor => ({
+    // Convert flavorImages to Flavor[] and filter out tropical-fusion and mango
+    const filteredFlavorImages = flavorImages.filter(flavor => 
+      !["tropical-fusion", "mango"].includes(flavor.id)
+    );
+    
+    const mappedFlavors: Flavor[] = filteredFlavorImages.map(flavor => ({
       id: flavor.id,
       name: flavor.title,
       description: flavor.description || `Premium ${flavor.title.toLowerCase().includes('sorbet') ? 'Italian sorbet' : 'Italian gelato'} made with the finest ingredients.`,
