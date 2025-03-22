@@ -19,11 +19,18 @@ interface FlavorCardProps {
 
 export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     toast.success(`${flavor.name} added to your cart!`);
+  };
+
+  const handleInfoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDialogOpen(true);
   };
 
   return (
@@ -72,16 +79,13 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
               </span>
               
               <div className="flex items-center space-x-2">
-                <Dialog>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
                       variant="outline" 
                       size="icon" 
                       className="rounded-full border-gelatico-pink text-gelatico-pink hover:bg-gelatico-baby-pink hover:bg-opacity-20"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
+                      onClick={handleInfoClick}
                     >
                       <Info size={18} />
                     </Button>
