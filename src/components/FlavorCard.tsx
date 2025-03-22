@@ -62,7 +62,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
               {flavor.name}
             </h3>
             
-            <p className="text-white mb-3 line-clamp-2">
+            <p className="text-gray-300 mb-3 line-clamp-2">
               {flavor.description}
             </p>
             
