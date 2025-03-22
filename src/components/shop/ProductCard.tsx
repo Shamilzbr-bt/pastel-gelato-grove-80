@@ -17,6 +17,15 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
     return parseFloat(price);
   };
 
+  // Helper function to clean image path
+  const cleanImagePath = (path: string) => {
+    // Remove /public prefix if it exists
+    if (path.startsWith('/public/')) {
+      return path.substring(7);
+    }
+    return path;
+  };
+
   return (
     <motion.div
       layout
@@ -29,12 +38,13 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       <div className="card">
         <div className="aspect-square relative overflow-hidden">
           <img 
-            src={product.images[0]?.src || 'https://placehold.co/400'} 
+            src={cleanImagePath(product.images[0]?.src || 'https://placehold.co/400')} 
             alt={product.title} 
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = 'https://placehold.co/400x400/e81cff/ffffff?text=Missing+Image';
+              target.src = '/lovable-uploads/ee7dd54f-f5d1-41fb-9c95-21e2916f3ee7.png';
+              console.log(`Failed to load image: ${product.images[0]?.src}`);
             }}
           />
           <div className="absolute top-3 left-3">
