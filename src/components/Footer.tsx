@@ -1,6 +1,5 @@
-
 import { Link } from 'react-router-dom';
-import { Instagram, Facebook, Send, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Facebook, Send, Mail, MapPin, Phone, Music } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -43,23 +42,7 @@ export default function Footer() {
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
                 aria-label="TikTok"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide-icon"
-                >
-                  <path d="M9 12a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
-                  <path d="M15 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
-                  <path d="M15 8v8a4 4 0 0 1-4 4"/>
-                  <line x1="15" x2="15" y1="6" y2="16"/>
-                </svg>
+                <Music size={18} />
               </a>
               <a 
                 href="https://t.snapchat.com/M4lIDwbs" 
