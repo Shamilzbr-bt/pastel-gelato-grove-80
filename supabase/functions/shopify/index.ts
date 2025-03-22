@@ -21,7 +21,6 @@ serve(async (req) => {
   }
 
   try {
-    // Log to help with debugging
     console.log('Edge function received request');
     
     const { action, data } = await req.json();
@@ -32,13 +31,21 @@ serve(async (req) => {
     console.log(`SHOPIFY_API_KEY is set: ${!!SHOPIFY_API_KEY}`);
     console.log(`SHOPIFY_API_SECRET is set: ${!!SHOPIFY_API_SECRET}`);
 
+    // Check if required environment variables are present
+    if (!SHOPIFY_API_KEY || !SHOPIFY_API_SECRET || !SHOPIFY_STORE_URL) {
+      console.error('Missing required Shopify credentials for action:', action);
+      return new Response(
+        JSON.stringify({ error: 'Shopify API credentials not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Base headers for all Shopify API requests
     const headers = {
       'Content-Type': 'application/json',
       'X-Shopify-Access-Token': SHOPIFY_API_SECRET,
     };
 
-    // Log the headers being used (without the actual secret)
     console.log('Using headers:', { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': '[REDACTED]' });
 
     let result;
@@ -88,23 +95,51 @@ serve(async (req) => {
         break;
 
       case 'createCheckout':
-        const { items, email, address } = data;
-        console.log('Creating checkout with items:', items);
-        
-        if (!items || items.length === 0) {
-          throw new Error('No items provided for checkout');
+        // For testing/development - send success response to verify frontend flow
+        if (Deno.env.get('SHOPIFY_DEV_MODE') === 'true') {
+          console.log('DEV MODE: Returning mock checkout response');
+          return new Response(
+            JSON.stringify({
+              checkout: { token: 'mock-token' },
+              checkout_url: `https://${SHOPIFY_STORE_URL}/checkout/mock-token`
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
         
-        // Create a checkout request
+        const { items, email, address } = data;
+        console.log('Creating checkout with items:', JSON.stringify(items));
+        
+        if (!items || items.length === 0) {
+          console.error('No items provided for checkout');
+          return new Response(
+            JSON.stringify({ error: 'No items provided for checkout' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        // Format line items correctly for Shopify API
+        const lineItems = items.map(item => {
+          // Check if the variant ID looks like a Shopify ID (typically a large number)
+          // If not, it might be our custom ID format which won't work with Shopify
+          const variantId = item.variantId;
+          console.log(`Processing line item with variantId: ${variantId}`);
+          
+          return {
+            variant_id: variantId,
+            quantity: item.quantity
+          };
+        });
+        
+        console.log('Formatted line items:', JSON.stringify(lineItems));
+        
+        // Create a checkout request with correctly formatted data
         const checkoutUrl = `${baseUrl}/checkouts.json`;
         console.log(`Making request to: ${checkoutUrl}`);
         
         const checkoutPayload = {
           checkout: {
-            line_items: items.map(item => ({
-              variant_id: item.variantId,
-              quantity: item.quantity
-            })),
+            line_items: lineItems,
             email: email || '',
             shipping_address: address || {}
           }
@@ -112,36 +147,67 @@ serve(async (req) => {
         
         console.log('Checkout payload:', JSON.stringify(checkoutPayload));
         
-        const checkoutResponse = await fetch(checkoutUrl, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(checkoutPayload)
-        });
-        
-        // Get response status and handle errors
-        const status = checkoutResponse.status;
-        console.log(`Checkout response status: ${status}`);
-        
-        if (!checkoutResponse.ok) {
-          const errorText = await checkoutResponse.text();
-          console.error('Shopify checkout error:', errorText);
+        try {
+          const checkoutResponse = await fetch(checkoutUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(checkoutPayload)
+          });
+          
+          // Get response status and handle errors
+          const status = checkoutResponse.status;
+          console.log(`Checkout response status: ${status}`);
+          
+          // Get the full response text for debugging
+          const responseText = await checkoutResponse.text();
+          console.log('Raw response:', responseText);
+          
+          if (!checkoutResponse.ok) {
+            console.error('Shopify checkout error:', responseText);
+            return new Response(
+              JSON.stringify({ 
+                error: `Failed to create checkout: ${status}`,
+                details: responseText
+              }),
+              { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          // Parse the JSON response if possible
+          let checkoutData;
+          try {
+            checkoutData = JSON.parse(responseText);
+            console.log('Checkout created successfully:', JSON.stringify(checkoutData));
+          } catch (e) {
+            console.error('Error parsing checkout response JSON:', e);
+            return new Response(
+              JSON.stringify({ 
+                error: 'Invalid response from Shopify',
+                details: responseText
+              }),
+              { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          // Generate the checkout web URL
+          if (checkoutData.checkout && checkoutData.checkout.token) {
+            checkoutData.checkout_url = `https://${SHOPIFY_STORE_URL}/checkout/${checkoutData.checkout.token}`;
+            console.log('Checkout URL created:', checkoutData.checkout_url);
+          } else {
+            console.error('Checkout token not found in response');
+          }
+          
+          result = checkoutData;
+        } catch (fetchError) {
+          console.error('Network error during checkout creation:', fetchError);
           return new Response(
-            JSON.stringify({ error: `Failed to create checkout: ${status}` }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ 
+              error: 'Network error during checkout creation',
+              details: fetchError.message
+            }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
-        // Get the checkout data
-        const checkoutData = await checkoutResponse.json();
-        console.log('Checkout created successfully:', checkoutData);
-        
-        // Generate the checkout web URL
-        if (checkoutData.checkout && checkoutData.checkout.token) {
-          checkoutData.checkout_url = `https://${SHOPIFY_STORE_URL}/checkout/${checkoutData.checkout.token}`;
-          console.log('Checkout URL created:', checkoutData.checkout_url);
-        }
-        
-        result = checkoutData;
         break;
 
       default:

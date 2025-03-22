@@ -89,6 +89,9 @@ export const shopifyService = {
         throw new Error('Cannot create checkout with empty cart');
       }
 
+      // Log what we're sending to help with debugging
+      console.log('Creating checkout with items:', items);
+
       const { data, error } = await supabase.functions.invoke('shopify', {
         body: { 
           action: 'createCheckout', 
@@ -102,11 +105,24 @@ export const shopifyService = {
 
       if (error) {
         console.error('Supabase Edge Function error:', error);
-        throw error;
+        return {
+          success: false,
+          error: error.message || 'Failed to create checkout'
+        };
+      }
+      
+      // Check for error in the response data
+      if (data && data.error) {
+        console.error('Error from Shopify API:', data.error, data.details || '');
+        return {
+          success: false,
+          error: data.error,
+          details: data.details
+        };
       }
       
       // Return checkout URL if available
-      if (data.checkout_url) {
+      if (data && data.checkout_url) {
         return {
           success: true,
           checkoutUrl: data.checkout_url,
@@ -116,7 +132,7 @@ export const shopifyService = {
       
       return {
         success: true,
-        checkout: data.checkout
+        checkout: data?.checkout
       };
     } catch (error) {
       console.error('Error creating Shopify checkout:', error);
