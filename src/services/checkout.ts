@@ -68,15 +68,16 @@ export const checkoutService = {
       const user = sessionData.session?.user;
       
       if (user) {
-        const { error } = await supabase.from('orders').insert({
-          id: orderId,
+        const orderData = {
           user_id: user.id,
-          items,
+          items: items,
           total_amount: totalAmount,
           status: 'processing',
           delivery_address: options.address || null,
           special_instructions: options.specialInstructions || null,
-        });
+        };
+        
+        const { error } = await supabase.from('orders').insert(orderData);
         
         if (error) {
           console.error('Error saving order to database:', error);

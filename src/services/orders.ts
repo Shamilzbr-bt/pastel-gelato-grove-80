@@ -10,6 +10,7 @@ export interface Order {
   status: string;
   delivery_address?: any;
   special_instructions?: string;
+  user_id: string;
 }
 
 export const ordersService = {
@@ -28,7 +29,13 @@ export const ordersService = {
         throw error;
       }
       
-      return data || [];
+      // Ensure items is an array, even if it comes as a JSON string
+      const processedData = data?.map(order => ({
+        ...order,
+        items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items
+      })) || [];
+      
+      return processedData as Order[];
     } catch (error) {
       console.error('Error in getUserOrders:', error);
       return [];
@@ -49,7 +56,13 @@ export const ordersService = {
         throw error;
       }
       
-      return data;
+      // Ensure items is an array, even if it comes as a JSON string
+      const processedData = data ? {
+        ...data,
+        items: typeof data.items === 'string' ? JSON.parse(data.items) : data.items
+      } : null;
+      
+      return processedData as Order | null;
     } catch (error) {
       console.error('Error in getOrderById:', error);
       return null;
