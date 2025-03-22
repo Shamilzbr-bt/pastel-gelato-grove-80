@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,6 +8,7 @@ import AboutSection from '@/components/AboutSection';
 import FlavorGrid from '@/components/FlavorGrid';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 const Index = () => {
   const [featuredFlavors, setFeaturedFlavors] = useState<Flavor[]>([]);
@@ -51,12 +53,13 @@ const Index = () => {
 
   return (
     <>
+      <AnimatedBackground />
       <Header />
       <Hero />
       <AboutSection />
 
       {/* Featured Flavors Section */}
-      <section className="py-16 bg-gelatico-light-yellow">
+      <section className="py-16 bg-gelatico-light-yellow bg-opacity-80 backdrop-blur-sm">
         <div className="container mx-auto text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-gelatico mb-8">
             Featured Flavors

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -63,12 +62,12 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Gelatico custom colors
 				gelatico: {
 					pink: '#EC5C9D',
 					'baby-pink': '#FFD1DC',
 					'peach-cream': '#FFF5E1',
 					'soft-blue': '#A7C7E7',
+					'light-yellow': '#FFF9E6'
 				}
 			},
 			borderRadius: {
