@@ -67,7 +67,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
             </p>
             
             <div className="flex items-center justify-between mt-4">
-              <span className="text-lg font-semibold text-white">
+              <span className="text-lg font-semibold text-gelatico-pink">
                 {formatPrice(flavor.price || 0)}
               </span>
               
