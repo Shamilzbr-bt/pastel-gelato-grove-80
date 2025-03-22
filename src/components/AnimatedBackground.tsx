@@ -58,7 +58,7 @@ function AnimatedScene() {
 
 export default function AnimatedBackground() {
   return (
-    <div className="fixed inset-0 -z-10 opacity-90">
+    <div className="fixed inset-0 -z-10 opacity-70 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 50 }}
         dpr={[1, 2]}

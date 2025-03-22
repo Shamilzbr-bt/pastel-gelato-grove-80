@@ -8,7 +8,6 @@ import AboutSection from '@/components/AboutSection';
 import FlavorGrid from '@/components/FlavorGrid';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import AnimatedBackground from '@/components/AnimatedBackground';
 
 const Index = () => {
   const [featuredFlavors, setFeaturedFlavors] = useState<Flavor[]>([]);
@@ -53,7 +52,6 @@ const Index = () => {
 
   return (
     <>
-      <AnimatedBackground />
       <Header />
       <Hero />
       <AboutSection />
