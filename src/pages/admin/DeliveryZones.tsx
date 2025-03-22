@@ -29,198 +29,174 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { 
-  MapPin,
-  Plus,
-  MoreVertical,
-  Edit,
-  Trash2,
-  CheckCircle,
-  XCircle,
-} from 'lucide-react';
+import { CheckCircle, Search, Plus, MapPin, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
-// We need to work with any type for now
-type DeliveryZone = any;
-
-export default function AdminDeliveryZones() {
+export default function DeliveryZones() {
   const queryClient = useQueryClient();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedZone, setSelectedZone] = useState<DeliveryZone | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isAddZoneDialogOpen, setIsAddZoneDialogOpen] = useState(false);
+  const [isEditZoneDialogOpen, setIsEditZoneDialogOpen] = useState(false);
+  const [selectedZone, setSelectedZone] = useState<any>(null);
+
+  // Form state
   const [formData, setFormData] = useState({
     city: '',
     province: '',
-    radiusKm: '',
-    isActive: true
+    radius_km: 10,
+    is_active: true
   });
   
-  // Fetch delivery zones - using mock data for now
-  const { data: zones = [], isLoading } = useQuery({
+  // Get all delivery zones
+  const { data: zones, isLoading } = useQuery({
     queryKey: ['deliveryZones'],
     queryFn: async () => {
-      try {
-        // In a real implementation, we would fetch from our database
-        // For now, return mock data
-        return [
-          { id: '1', city: 'Kuwait City', province: 'Capital', radius_km: 5, is_active: true },
-          { id: '2', city: 'Salmiya', province: 'Hawalli', radius_km: 3, is_active: true },
-          { id: '3', city: 'Jahra', province: 'Jahra', radius_km: 4, is_active: false },
-          { id: '4', city: 'Ahmadi', province: 'Ahmadi', radius_km: 5, is_active: true },
-          { id: '5', city: 'Fahaheel', province: 'Ahmadi', radius_km: 3, is_active: true },
-        ];
-      } catch (error) {
-        console.error('Error fetching delivery zones:', error);
-        return [];
+      const { data, error } = await supabase
+        .from('delivery_zones')
+        .select('*')
+        .order('province', { ascending: true })
+        .order('city', { ascending: true });
+        
+      if (error) {
+        throw error;
       }
+      
+      return data || [];
     }
   });
   
-  // Add delivery zone mutation
+  // Add new zone mutation
   const addZoneMutation = useMutation({
     mutationFn: async (zoneData: any) => {
-      // In a real implementation, we would add to our database
-      // For now, just simulate a successful response
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { id: Math.random().toString(), ...zoneData };
+      const { error } = await supabase
+        .from('delivery_zones')
+        .insert(zoneData);
+        
+      if (error) throw error;
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
-      setIsDialogOpen(false);
+      setIsAddZoneDialogOpen(false);
       resetForm();
-      toast.success('Delivery zone added successfully!');
+      toast.success('Delivery zone added successfully');
     },
     onError: (error: any) => {
-      toast.error(`Failed to add delivery zone: ${error.message}`);
+      toast.error(`Failed to add zone: ${error.message}`);
     }
   });
   
-  // Update delivery zone mutation
+  // Update zone mutation
   const updateZoneMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      // In a real implementation, we would update our database
-      // For now, just simulate a successful response
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { id, ...data };
+      const { error } = await supabase
+        .from('delivery_zones')
+        .update(data)
+        .eq('id', id);
+        
+      if (error) throw error;
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
-      setIsDialogOpen(false);
-      resetForm();
-      toast.success('Delivery zone updated successfully!');
+      setIsEditZoneDialogOpen(false);
+      setSelectedZone(null);
+      toast.success('Delivery zone updated successfully');
     },
     onError: (error: any) => {
-      toast.error(`Failed to update delivery zone: ${error.message}`);
+      toast.error(`Failed to update zone: ${error.message}`);
     }
   });
   
-  // Delete delivery zone mutation
+  // Delete zone mutation
   const deleteZoneMutation = useMutation({
     mutationFn: async (id: string) => {
-      // In a real implementation, we would delete from our database
-      // For now, just simulate a successful response
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { success: true };
+      const { error } = await supabase
+        .from('delivery_zones')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
-      setIsDeleteDialogOpen(false);
-      setSelectedZone(null);
-      toast.success('Delivery zone deleted successfully!');
+      toast.success('Delivery zone deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(`Failed to delete delivery zone: ${error.message}`);
+      toast.error(`Failed to delete zone: ${error.message}`);
     }
   });
   
-  // Toggle active status mutation
-  const toggleStatusMutation = useMutation({
-    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      // In a real implementation, we would update our database
-      // For now, just simulate a successful response
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { id, is_active: isActive };
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['deliveryZones'] });
-      toast.success(`Delivery zone ${variables.isActive ? 'activated' : 'deactivated'} successfully!`);
-    },
-    onError: (error: any) => {
-      toast.error(`Failed to update status: ${error.message}`);
-    }
-  });
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+    
+    setFormData({
+      ...formData,
+      [name]: type === 'number' ? parseFloat(value) : value
+    });
   };
   
   const handleSwitchChange = (checked: boolean) => {
-    setFormData(prev => ({ ...prev, isActive: checked }));
-  };
-  
-  const handleOpenDialog = (zone?: DeliveryZone) => {
-    if (zone) {
-      setSelectedZone(zone);
-      setFormData({
-        city: zone.city,
-        province: zone.province,
-        radiusKm: zone.radius_km.toString(),
-        isActive: zone.is_active
-      });
-    } else {
-      setSelectedZone(null);
-      resetForm();
-    }
-    setIsDialogOpen(true);
+    setFormData({
+      ...formData,
+      is_active: checked
+    });
   };
   
   const resetForm = () => {
     setFormData({
       city: '',
       province: '',
-      radiusKm: '',
-      isActive: true
+      radius_km: 10,
+      is_active: true
     });
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleAddZone = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const zoneData = {
-      city: formData.city,
-      province: formData.province,
-      radius_km: parseFloat(formData.radiusKm),
-      is_active: formData.isActive
-    };
-    
+    addZoneMutation.mutate(formData);
+  };
+  
+  const handleEditZone = (e: React.FormEvent) => {
+    e.preventDefault();
     if (selectedZone) {
-      updateZoneMutation.mutate({ id: selectedZone.id, data: zoneData });
-    } else {
-      addZoneMutation.mutate(zoneData);
+      updateZoneMutation.mutate({
+        id: selectedZone.id,
+        data: formData
+      });
     }
   };
   
-  const handleDelete = () => {
-    if (selectedZone) {
-      deleteZoneMutation.mutate(selectedZone.id);
+  const handleDeleteZone = (id: string) => {
+    if (confirm('Are you sure you want to delete this delivery zone?')) {
+      deleteZoneMutation.mutate(id);
     }
   };
   
-  const handleToggleStatus = (id: string, currentStatus: boolean) => {
-    toggleStatusMutation.mutate({ id, isActive: !currentStatus });
+  const openEditDialog = (zone: any) => {
+    setSelectedZone(zone);
+    setFormData({
+      city: zone.city,
+      province: zone.province,
+      radius_km: zone.radius_km || 10,
+      is_active: zone.is_active !== false // Default to true if undefined
+    });
+    setIsEditZoneDialogOpen(true);
   };
+  
+  // Filter zones based on search term
+  const filteredZones = zones?.filter(zone => 
+    zone.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    zone.province.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   
   return (
     <div className="min-h-screen bg-white">
@@ -238,7 +214,7 @@ export default function AdminDeliveryZones() {
           </span>
           <h1 className="text-4xl sm:text-5xl font-bold font-gelatico mb-2">Delivery Zones</h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Manage the areas where your ice cream can be delivered
+            Manage where your ice cream can be delivered
           </p>
         </motion.div>
         
@@ -248,93 +224,78 @@ export default function AdminDeliveryZones() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <CardTitle>Delivery Zones</CardTitle>
-                  <CardDescription>Manage areas where your ice cream delivery is available</CardDescription>
+                  <CardDescription>Manage locations where you deliver ice cream</CardDescription>
                 </div>
-                <Button onClick={() => handleOpenDialog()}>
+                <Button onClick={() => setIsAddZoneDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Zone
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
+              <div className="mb-6">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search zones..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                  />
+                </div>
+              </div>
+              
               {isLoading ? (
                 <div className="flex items-center justify-center p-12">
                   <div className="w-8 h-8 border-4 border-gelatico-pink rounded-full border-t-transparent animate-spin"></div>
                 </div>
-              ) : zones && zones.length > 0 ? (
+              ) : filteredZones && filteredZones.length > 0 ? (
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>City</TableHead>
                         <TableHead>Province</TableHead>
+                        <TableHead>City</TableHead>
                         <TableHead>Radius (km)</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {zones.map((zone: DeliveryZone) => (
+                      {filteredZones.map((zone) => (
                         <TableRow key={zone.id}>
-                          <TableCell className="font-medium">{zone.city}</TableCell>
-                          <TableCell>{zone.province}</TableCell>
-                          <TableCell>{zone.radius_km} km</TableCell>
+                          <TableCell className="font-medium">{zone.province}</TableCell>
+                          <TableCell>{zone.city}</TableCell>
+                          <TableCell>{zone.radius_km || 'Not specified'}</TableCell>
                           <TableCell>
-                            <div className="flex items-center">
-                              {zone.is_active ? (
-                                <div className="flex items-center text-green-600">
-                                  <CheckCircle className="h-4 w-4 mr-1" />
-                                  <span>Active</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center text-red-600">
-                                  <XCircle className="h-4 w-4 mr-1" />
-                                  <span>Inactive</span>
-                                </div>
-                              )}
-                            </div>
+                            {zone.is_active !== false ? (
+                              <div className="flex items-center text-green-600">
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                <span>Active</span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">Inactive</span>
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => handleOpenDialog(zone)}>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => {
-                                    setSelectedZone(zone);
-                                    setIsDeleteDialogOpen(true);
-                                  }}
-                                  className="text-red-600"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  onClick={() => handleToggleStatus(zone.id, zone.is_active)}
-                                >
-                                  {zone.is_active ? (
-                                    <>
-                                      <XCircle className="h-4 w-4 mr-2" />
-                                      Deactivate
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CheckCircle className="h-4 w-4 mr-2" />
-                                      Activate
-                                    </>
-                                  )}
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => openEditDialog(zone)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="text-red-600"
+                                onClick={() => handleDeleteZone(zone.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -343,15 +304,17 @@ export default function AdminDeliveryZones() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No Delivery Zones</h3>
+                  <MapPin className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-lg font-medium mb-2">No delivery zones found</p>
                   <p className="text-muted-foreground mb-6">
-                    You haven't added any delivery zones yet. Add zones to define where your ice cream can be delivered.
+                    {searchTerm ? 'Try a different search term' : 'Add your first delivery zone to get started'}
                   </p>
-                  <Button onClick={() => handleOpenDialog()}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add First Zone
-                  </Button>
+                  {!searchTerm && (
+                    <Button onClick={() => setIsAddZoneDialogOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Zone
+                    </Button>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -359,35 +322,17 @@ export default function AdminDeliveryZones() {
         </div>
       </div>
       
-      {/* Add/Edit Zone Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {/* Add Zone Dialog */}
+      <Dialog open={isAddZoneDialogOpen} onOpenChange={setIsAddZoneDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {selectedZone ? 'Edit Delivery Zone' : 'Add New Delivery Zone'}
-            </DialogTitle>
+            <DialogTitle>Add Delivery Zone</DialogTitle>
             <DialogDescription>
-              {selectedZone 
-                ? 'Update delivery zone information' 
-                : 'Define a new area where you deliver ice cream'
-              }
+              Add a new location where you can deliver ice cream
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleAddZone}>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="city" className="text-right">
-                  City
-                </Label>
-                <Input
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className="col-span-3"
-                  required
-                />
-              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="province" className="text-right">
                   Province
@@ -402,82 +347,152 @@ export default function AdminDeliveryZones() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="radiusKm" className="text-right">
-                  Radius (km)
+                <Label htmlFor="city" className="text-right">
+                  City
                 </Label>
                 <Input
-                  id="radiusKm"
-                  name="radiusKm"
-                  type="number"
-                  step="0.1"
-                  min="0.1"
-                  value={formData.radiusKm}
+                  id="city"
+                  name="city"
+                  value={formData.city}
                   onChange={handleInputChange}
                   className="col-span-3"
                   required
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="isActive" className="text-right">
+                <Label htmlFor="radius_km" className="text-right">
+                  Radius (km)
+                </Label>
+                <Input
+                  id="radius_km"
+                  name="radius_km"
+                  type="number"
+                  min="1"
+                  step="0.1"
+                  value={formData.radius_km}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="is_active" className="text-right">
                   Active
                 </Label>
                 <div className="flex items-center space-x-2 col-span-3">
                   <Switch
-                    id="isActive"
-                    checked={formData.isActive}
+                    id="is_active"
+                    checked={formData.is_active}
                     onCheckedChange={handleSwitchChange}
                   />
-                  <Label htmlFor="isActive">
-                    {formData.isActive ? 'Enabled' : 'Disabled'}
+                  <Label htmlFor="is_active">
+                    {formData.is_active ? 'Active' : 'Inactive'}
                   </Label>
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  resetForm();
+                  setIsAddZoneDialogOpen(false);
+                }}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={addZoneMutation.isPending || updateZoneMutation.isPending}>
-                {addZoneMutation.isPending || updateZoneMutation.isPending 
-                  ? 'Saving...' 
-                  : selectedZone ? 'Save Changes' : 'Add Zone'
-                }
+              <Button type="submit" disabled={addZoneMutation.isPending}>
+                {addZoneMutation.isPending ? 'Adding...' : 'Add Zone'}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
       
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      {/* Edit Zone Dialog */}
+      <Dialog open={isEditZoneDialogOpen} onOpenChange={setIsEditZoneDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Delivery Zone</DialogTitle>
+            <DialogTitle>Edit Delivery Zone</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this delivery zone? This action cannot be undone.
+              Update delivery zone details
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            {selectedZone && (
-              <div className="p-4 border border-red-100 bg-red-50 rounded-md">
-                <p><strong>City:</strong> {selectedZone.city}</p>
-                <p><strong>Province:</strong> {selectedZone.province}</p>
-                <p><strong>Radius:</strong> {selectedZone.radius_km} km</p>
+          <form onSubmit={handleEditZone}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-province" className="text-right">
+                  Province
+                </Label>
+                <Input
+                  id="edit-province"
+                  name="province"
+                  value={formData.province}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  required
+                />
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={handleDelete} 
-              disabled={deleteZoneMutation.isPending}
-            >
-              {deleteZoneMutation.isPending ? 'Deleting...' : 'Delete Zone'}
-            </Button>
-          </DialogFooter>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-city" className="text-right">
+                  City
+                </Label>
+                <Input
+                  id="edit-city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-radius_km" className="text-right">
+                  Radius (km)
+                </Label>
+                <Input
+                  id="edit-radius_km"
+                  name="radius_km"
+                  type="number"
+                  min="1"
+                  step="0.1"
+                  value={formData.radius_km}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-is_active" className="text-right">
+                  Active
+                </Label>
+                <div className="flex items-center space-x-2 col-span-3">
+                  <Switch
+                    id="edit-is_active"
+                    checked={formData.is_active}
+                    onCheckedChange={handleSwitchChange}
+                  />
+                  <Label htmlFor="edit-is_active">
+                    {formData.is_active ? 'Active' : 'Inactive'}
+                  </Label>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setSelectedZone(null);
+                  setIsEditZoneDialogOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={updateZoneMutation.isPending}>
+                {updateZoneMutation.isPending ? 'Updating...' : 'Save Changes'}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
       

@@ -91,16 +91,16 @@ export const checkoutService = {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Create an order in the database
+      // Create an order in the database - cast Json data appropriately
       const { data: order, error } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
           status: 'pending',
           total_amount: totalAmount,
-          items: orderSummary,
-          delivery_address: options.address,
-          delivery_time: options.delivery_time,
+          items: orderSummary as any, // Cast to any since we know this matches Json structure
+          delivery_address: options.address as any, // Cast to any for Json column
+          delivery_time: options.delivery_time as any, // Cast to any for Json column
           special_instructions: options.special_instructions,
           payment_method: paymentDetails.payment_method
         })
@@ -117,7 +117,7 @@ export const checkoutService = {
           .from('user_addresses')
           .upsert({
             user_id: user.id,
-            address: options.address,
+            address: options.address as any, // Cast to any for Json column
             is_default: true
           });
           
@@ -225,7 +225,7 @@ export const checkoutService = {
         .from('user_addresses')
         .insert({
           user_id: user.id,
-          address,
+          address: address as any, // Cast to any for Json column
           is_default: address.is_default || false
         })
         .select()
@@ -277,6 +277,171 @@ export const checkoutService = {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Error getting addresses'
+      };
+    }
+  },
+
+  /**
+   * Add a new address
+   */
+  async addAddress(addressData: CheckoutAddress) {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      
+      if (!user) {
+        throw new Error('User must be logged in to add an address');
+      }
+      
+      // If this address is set as default, update all other addresses to non-default
+      if (addressData.is_default) {
+        await supabase
+          .from('user_addresses')
+          .update({ is_default: false })
+          .eq('user_id', user.id);
+      }
+      
+      const { data, error } = await supabase
+        .from('user_addresses')
+        .insert({
+          user_id: user.id,
+          address: addressData as any, // Cast to any for Json column
+          is_default: addressData.is_default || false
+        })
+        .select()
+        .single();
+        
+      if (error) {
+        throw error;
+      }
+      
+      return {
+        success: true,
+        addressId: data.id
+      };
+    } catch (error) {
+      console.error('Error adding address:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error adding address'
+      };
+    }
+  },
+  
+  /**
+   * Update an existing address
+   */
+  async updateAddress(addressId: string, addressData: CheckoutAddress) {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      
+      if (!user) {
+        throw new Error('User must be logged in to update an address');
+      }
+      
+      // If this address is set as default, update all other addresses to non-default
+      if (addressData.is_default) {
+        await supabase
+          .from('user_addresses')
+          .update({ is_default: false })
+          .eq('user_id', user.id)
+          .neq('id', addressId);
+      }
+      
+      const { error } = await supabase
+        .from('user_addresses')
+        .update({
+          address: addressData as any, // Cast to any for Json column
+          is_default: addressData.is_default || false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', addressId)
+        .eq('user_id', user.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      return {
+        success: true
+      };
+    } catch (error) {
+      console.error('Error updating address:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error updating address'
+      };
+    }
+  },
+  
+  /**
+   * Delete an address
+   */
+  async deleteAddress(addressId: string) {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      
+      if (!user) {
+        throw new Error('User must be logged in to delete an address');
+      }
+      
+      const { error } = await supabase
+        .from('user_addresses')
+        .delete()
+        .eq('id', addressId)
+        .eq('user_id', user.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      return {
+        success: true
+      };
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error deleting address'
+      };
+    }
+  },
+  
+  /**
+   * Set an address as default
+   */
+  async setDefaultAddress(addressId: string) {
+    try {
+      const user = (await supabase.auth.getUser()).data.user;
+      
+      if (!user) {
+        throw new Error('User must be logged in to set a default address');
+      }
+      
+      // First, set all addresses to non-default
+      await supabase
+        .from('user_addresses')
+        .update({ is_default: false })
+        .eq('user_id', user.id);
+      
+      // Then set the specified address as default
+      const { error } = await supabase
+        .from('user_addresses')
+        .update({ is_default: true })
+        .eq('id', addressId)
+        .eq('user_id', user.id);
+        
+      if (error) {
+        throw error;
+      }
+      
+      return {
+        success: true
+      };
+    } catch (error) {
+      console.error('Error setting default address:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error setting default address'
       };
     }
   }
