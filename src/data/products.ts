@@ -1,3 +1,4 @@
+
 import { ShopifyProduct } from "@/services/shopify";
 
 // Define gelato flavors using the uploaded images
@@ -120,14 +121,16 @@ export const flavorImages = [
     title: "Tropical Fusion Sorbet",
     image: "/public/lovable-uploads/8b030dc4-c8c6-4050-8198-0a33c9fdd312.png",
     price: "1.900",
-    tags: "Sorbet"
+    tags: "Sorbet",
+    description: "An exotic blend of tropical fruits creating a refreshing and vibrant sorbet experience that transports you to paradise."
   },
   {
     id: "mango",
     title: "Mango Sorbet",
     image: "/public/lovable-uploads/b46d4ebf-e0ea-4c47-89b9-0c15123ec875.png",
     price: "1.900",
-    tags: "Sorbet"
+    tags: "Sorbet",
+    description: "Luscious mango sorbet made with perfectly ripened Alphonso mangoes, delivering a sweet, aromatic taste of tropical indulgence."
   },
   {
     id: "raspberry",
@@ -146,14 +149,16 @@ export const additionalImages = [
     title: "Strawberry Milkshake",
     image: "/public/lovable-uploads/6e2cb952-a736-44cf-9688-34ddc202a542.png",
     price: "2.500",
-    tags: "Milkshakes"
+    tags: "Milkshakes",
+    description: "Creamy strawberry milkshake blended with premium gelato and fresh strawberries, topped with whipped cream."
   },
   {
     id: "milk-shake-pistachio",
     title: "Pistachio Milkshake",
     image: "/public/lovable-uploads/85bd8d12-912e-4165-a3b1-a06f09e4360d.png",
     price: "2.500",
-    tags: "Milkshakes"
+    tags: "Milkshakes",
+    description: "Rich pistachio milkshake made with our signature pistachio gelato, creating a nutty and indulgent treat."
   }
 ];
 
@@ -192,3 +197,4 @@ export const getDemoProducts = (): ShopifyProduct[] => [
   },
   ...getLocalProducts()
 ];
+
