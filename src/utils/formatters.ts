@@ -9,18 +9,6 @@ export const formatPrice = (price: string | number) => {
 };
 
 /**
- * Format date to a readable format
- */
-export const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-};
-
-/**
  * Get CSS class for flavor tag
  */
 export const getTagClass = (tag: string) => {

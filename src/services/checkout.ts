@@ -1,7 +1,6 @@
 
 import { toast } from "sonner";
 import { CartItem } from "@/hooks/useCart";
-import { supabase } from "@/integrations/supabase/client";
 
 export interface CheckoutAddress {
   first_name?: string;
@@ -18,7 +17,6 @@ export interface CheckoutAddress {
 export interface CheckoutOptions {
   email?: string;
   address?: CheckoutAddress;
-  specialInstructions?: string;
 }
 
 export const checkoutService = {
@@ -60,34 +58,14 @@ export const checkoutService = {
       
       console.log('Order summary:', orderSummary);
       
+      // In a real application, you would:
+      // 1. Save the order to a database
+      // 2. Process payment through a payment gateway
+      // 3. Send confirmation emails
+      // 4. Update inventory
+
       // Generate a unique order ID
       const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      
-      // Save the order to the database if the user is logged in
-      const { data: sessionData } = await supabase.auth.getSession();
-      const user = sessionData.session?.user;
-      
-      if (user) {
-        const orderData = {
-          user_id: user.id,
-          items: items,
-          total_amount: totalAmount,
-          status: 'processing',
-          delivery_address: options.address || null,
-          special_instructions: options.specialInstructions || null,
-        };
-        
-        const { error } = await supabase.from('orders').insert(orderData);
-        
-        if (error) {
-          console.error('Error saving order to database:', error);
-          // Continue with processing anyway, but log the error
-        } else {
-          console.log('Order saved to database successfully');
-        }
-      } else {
-        console.log('User not logged in, order not saved to database');
-      }
       
       return {
         success: true,
