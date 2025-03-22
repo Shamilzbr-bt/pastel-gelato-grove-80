@@ -1,12 +1,12 @@
 
 import { motion } from 'framer-motion';
 import { ShoppingBag } from 'lucide-react';
-import { ShopifyProduct } from '@/services/shopify';
+import { Product } from '@/pages/Shop';
 import { formatPrice } from '@/utils/formatters';
 
 interface ProductCardProps {
-  product: ShopifyProduct;
-  onAddToCart: (product: ShopifyProduct) => void;
+  product: Product;
+  onAddToCart: (product: Product) => void;
 }
 
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {

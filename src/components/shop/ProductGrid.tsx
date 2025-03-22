@@ -1,12 +1,12 @@
 
 import { motion } from 'framer-motion';
-import { ShopifyProduct } from '@/services/shopify';
+import { Product } from '@/pages/Shop';
 import ProductCard from './ProductCard';
 
 interface ProductGridProps {
-  products: ShopifyProduct[];
+  products: Product[];
   isLoading: boolean;
-  onAddToCart: (product: ShopifyProduct) => void;
+  onAddToCart: (product: Product) => void;
   onResetCategory: () => void;
 }
 

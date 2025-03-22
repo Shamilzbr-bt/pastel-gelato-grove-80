@@ -1,6 +1,6 @@
 
 import { Trash2 } from 'lucide-react';
-import { CartItem as CartItemType } from '@/services/shopify';
+import { CartItem as CartItemType } from '@/hooks/useCart';
 import CartItem from './CartItem';
 import { motion } from 'framer-motion';
 

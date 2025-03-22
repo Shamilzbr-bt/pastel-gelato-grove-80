@@ -1,6 +1,6 @@
 
 import { Minus, Plus, Trash2 } from 'lucide-react';
-import { CartItem as CartItemType } from '@/services/shopify';
+import { CartItem as CartItemType } from '@/hooks/useCart';
 import { toast } from "sonner";
 
 interface CartItemProps {

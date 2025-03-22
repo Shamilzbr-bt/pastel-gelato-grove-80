@@ -1,37 +1,80 @@
 
-import { useState, useEffect } from 'react';
-import { CartItem } from '@/services/shopify';
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+
+export interface CartItem {
+  variantId: string;
+  quantity: number;
+  title?: string;
+  price?: string;
+  image?: string;
+  variantTitle?: string;
+}
 
 export function useCart() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   
-  // Load cart from localStorage
+  // Load cart on mount
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('gelatico-cart');
-      if (savedCart) {
+    const savedCart = localStorage.getItem('gelatico-cart');
+    if (savedCart) {
+      try {
         setCartItems(JSON.parse(savedCart));
+      } catch (e) {
+        console.error('Error loading cart from localStorage:', e);
+        localStorage.removeItem('gelatico-cart');
       }
-    } catch (error) {
-      console.error('Error loading cart from localStorage:', error);
     }
+    
+    // Listen for cart updates from other tabs/components
+    const handleCartUpdate = () => {
+      const updatedCart = localStorage.getItem('gelatico-cart');
+      if (updatedCart) {
+        try {
+          setCartItems(JSON.parse(updatedCart));
+        } catch (e) {
+          console.error('Error parsing updated cart:', e);
+        }
+      }
+    };
+    
+    window.addEventListener('cart-updated', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cart-updated', handleCartUpdate);
+    };
   }, []);
   
-  // Save cart to localStorage whenever it changes
+  // Save cart on change
   useEffect(() => {
-    try {
-      localStorage.setItem('gelatico-cart', JSON.stringify(cartItems));
-      // Dispatch event to notify other components of cart update
-      window.dispatchEvent(new Event('cart-updated'));
-    } catch (error) {
-      console.error('Error saving cart to localStorage:', error);
-    }
+    localStorage.setItem('gelatico-cart', JSON.stringify(cartItems));
+    // Dispatch event for other components to pick up
+    window.dispatchEvent(new Event('cart-updated'));
   }, [cartItems]);
   
+  const addItem = (item: CartItem) => {
+    setCartItems(prevItems => {
+      const existingItemIndex = prevItems.findIndex(i => i.variantId === item.variantId);
+      
+      if (existingItemIndex >= 0) {
+        // Update quantity if item exists
+        const updatedItems = [...prevItems];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + item.quantity
+        };
+        return updatedItems;
+      } else {
+        // Add new item
+        return [...prevItems, item];
+      }
+    });
+    
+    toast.success(`${item.title || 'Product'} added to cart`);
+  };
+  
   const updateQuantity = (variantId: string, newQuantity: number) => {
-    if (newQuantity < 1) {
+    if (newQuantity <= 0) {
       removeItem(variantId);
       return;
     }
@@ -52,24 +95,27 @@ export function useCart() {
   
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem('gelatico-cart');
     toast.success("Cart cleared");
   };
   
-  const calculateSubtotal = () => {
+  const calculateSubtotal = (): number => {
     return cartItems.reduce((total, item) => {
       const price = item.price ? parseFloat(item.price) : 0;
       return total + (price * item.quantity);
     }, 0);
   };
   
+  const itemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+  
   return {
     cartItems,
     setCartItems,
-    isLoading,
-    setIsLoading,
+    addItem,
     updateQuantity,
     removeItem,
     clearCart,
-    calculateSubtotal
+    calculateSubtotal,
+    itemCount,
   };
 }

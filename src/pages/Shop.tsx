@@ -3,31 +3,41 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { toast } from "sonner";
-import { shopifyService, ShopifyProduct, CartItem } from '@/services/shopify';
 import ShopPageHeader from '@/components/shop/ShopPageHeader';
 import CategoryFilter from '@/components/shop/CategoryFilter';
 import ProductGrid from '@/components/shop/ProductGrid';
 import GiftCardHighlight from '@/components/shop/GiftCardHighlight';
 import { getLocalProducts, getDemoProducts } from '@/data/products';
+import { useCart, CartItem } from '@/hooks/useCart';
+
+export interface Product {
+  id: string;
+  title: string;
+  description: string;
+  handle: string;
+  images: { src: string }[];
+  variants: {
+    id: string;
+    price: string;
+    title: string;
+  }[];
+  tags: string;
+}
 
 export default function Shop() {
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const { addItem } = useCart();
   
-  // Fetch products from Shopify
+  // Fetch products
   useEffect(() => {
     async function fetchProducts() {
       setIsLoading(true);
       try {
-        const shopifyProducts = await shopifyService.getProducts();
-        
-        // Combine Shopify products with our local products
+        // Get local products only
         const localProducts = getLocalProducts();
-        
-        const allProducts = [...shopifyProducts, ...localProducts];
-        setProducts(allProducts);
+        setProducts(localProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
         toast.error("Failed to load products. Using demo data instead.");
@@ -57,7 +67,7 @@ export default function Shop() {
       ) 
     : products;
   
-  const addToCart = (product: ShopifyProduct) => {
+  const addToCart = (product: Product) => {
     // Use the first variant by default
     const variant = product.variants[0];
     if (!variant) {
@@ -65,36 +75,16 @@ export default function Shop() {
       return;
     }
     
-    setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.variantId === variant.id);
-      if (existingItem) {
-        return prevCart.map(item => 
-          item.variantId === variant.id 
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        const newItem = { 
-          variantId: variant.id, 
-          quantity: 1,
-          title: product.title,
-          price: variant.price,
-          image: product.images[0]?.src,
-          variantTitle: variant.title
-        };
-        
-        // Store updated cart in localStorage
-        const updatedCart = [...prevCart, newItem];
-        localStorage.setItem('gelatico-cart', JSON.stringify(updatedCart));
-        
-        // Dispatch event to notify other components
-        window.dispatchEvent(new Event('cart-updated'));
-        
-        return updatedCart;
-      }
-    });
+    const newItem: CartItem = { 
+      variantId: variant.id, 
+      quantity: 1,
+      title: product.title,
+      price: variant.price,
+      image: product.images[0]?.src,
+      variantTitle: variant.title
+    };
     
-    toast.success(`${product.title} added to your cart!`);
+    addItem(newItem);
   };
 
   return (

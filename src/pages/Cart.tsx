@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -32,6 +33,7 @@ export default function Cart() {
     setIsCheckingOut(true);
     
     try {
+      // Process the checkout locally
       const response = await checkoutService.processCheckout(cartItems);
       
       if (response.success) {
@@ -40,7 +42,7 @@ export default function Cart() {
         // Clear the cart after successful checkout
         clearCart();
         
-        // Navigate to success page
+        // Navigate to success page with order details
         navigate(`/checkout-success?orderId=${response.orderId}`);
       } else {
         toast.error(response.error || "There was a problem processing your order");
