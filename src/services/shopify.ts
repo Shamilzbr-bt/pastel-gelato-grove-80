@@ -51,7 +51,11 @@ export const shopifyService = {
         body: { action: 'getProducts' }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from Shopify edge function:', error);
+        throw error;
+      }
+      
       return data.products || [];
     } catch (error) {
       console.error('Error fetching Shopify products:', error);
@@ -96,7 +100,10 @@ export const shopifyService = {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase Edge Function error:', error);
+        throw error;
+      }
       
       // Return checkout URL if available
       if (data.checkout_url) {

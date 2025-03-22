@@ -82,7 +82,6 @@ export default function Cart() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="grid grid-cols-1 lg:grid-cols-3 gap-10"
           >
-            {/* Cart Items */}
             <CartItemList 
               cartItems={cartItems}
               updateQuantity={updateQuantity}
@@ -90,7 +89,6 @@ export default function Cart() {
               clearCart={clearCart}
             />
             
-            {/* Order Summary */}
             <OrderSummary 
               subtotal={subtotal}
               shippingFee={shippingFee}
