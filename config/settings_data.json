@@ -1,0 +1,33 @@
+
+{
+  "current": {
+    "gelatico_pink": "#EC5C9D",
+    "gelatico_baby_pink": "#FFD1DC",
+    "gelatico_peach_cream": "#FFF5E1",
+    "gelatico_soft_blue": "#A7C7E7",
+    "gelatico_light_yellow": "#FFF9E6",
+    "heading_font": "playfair_display",
+    "body_font": "poppins",
+    "social_instagram_link": "https://www.instagram.com/gelatico.kw",
+    "social_facebook_link": "https://www.facebook.com/gelatico.kw",
+    "social_tiktok_link": "https://www.tiktok.com/@gelatico.kw",
+    "social_snapchat_link": "https://t.snapchat.com/M4lIDwbs",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "show_border": false
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "footer_text": "Artisanal gelato crafted with passion, bringing a taste of Italy to Kuwait.",
+          "store_address": "Boulevard Mall, Salmiya\nKuwait",
+          "store_phone": "+965 2221 1234",
+          "store_email": "hello@gelatico.kw"
+        }
+      }
+    }
+  }
+}

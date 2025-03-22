@@ -1,0 +1,116 @@
+
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Gelatico",
+    "theme_version": "1.0.0",
+    "theme_author": "Gelatico",
+    "theme_documentation_url": "",
+    "theme_support_url": ""
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Branding"
+      },
+      {
+        "type": "color",
+        "id": "gelatico_pink",
+        "label": "Gelatico Pink",
+        "default": "#EC5C9D"
+      },
+      {
+        "type": "color",
+        "id": "gelatico_baby_pink",
+        "label": "Baby Pink",
+        "default": "#FFD1DC"
+      },
+      {
+        "type": "color",
+        "id": "gelatico_peach_cream",
+        "label": "Peach Cream",
+        "default": "#FFF5E1"
+      },
+      {
+        "type": "color",
+        "id": "gelatico_soft_blue",
+        "label": "Soft Blue",
+        "default": "#A7C7E7"
+      },
+      {
+        "type": "color",
+        "id": "gelatico_light_yellow",
+        "label": "Light Yellow",
+        "default": "#FFF9E6"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Headings"
+      },
+      {
+        "type": "select",
+        "id": "heading_font",
+        "label": "Font Family",
+        "options": [
+          {
+            "value": "playfair_display",
+            "label": "Playfair Display"
+          }
+        ],
+        "default": "playfair_display"
+      },
+      {
+        "type": "header",
+        "content": "Body Text"
+      },
+      {
+        "type": "select",
+        "id": "body_font",
+        "label": "Font Family",
+        "options": [
+          {
+            "value": "poppins",
+            "label": "Poppins"
+          }
+        ],
+        "default": "poppins"
+      }
+    ]
+  },
+  {
+    "name": "Social Media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "info": "https://instagram.com/youraccount"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "Facebook",
+        "info": "https://facebook.com/youraccount"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok_link",
+        "label": "TikTok",
+        "info": "https://tiktok.com/@youraccount"
+      },
+      {
+        "type": "text",
+        "id": "social_snapchat_link",
+        "label": "Snapchat",
+        "info": "https://snapchat.com/add/youraccount"
+      }
+    ]
+  }
+]

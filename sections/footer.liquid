@@ -1,0 +1,180 @@
+
+<footer class="bg-gelatico-peach-cream">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+      <!-- Logo & Description -->
+      <div class="lg:col-span-1">
+        <a href="/" class="inline-block">
+          {% if settings.logo != blank %}
+            <img 
+              src="{{ settings.logo | img_url: 'medium' }}" 
+              alt="{{ shop.name }}" 
+              class="h-12 w-auto mb-4"
+            >
+          {% else %}
+            <h1 class="text-3xl font-bold font-gelatico text-gelatico-pink mb-4">{{ shop.name }}</h1>
+          {% endif %}
+        </a>
+        <p class="text-muted-foreground mb-6">
+          {{ settings.footer_text | default: "Artisanal gelato crafted with passion." }}
+        </p>
+        <div class="flex space-x-4">
+          {% if settings.social_instagram_link != blank %}
+            <a 
+              href="{{ settings.social_instagram_link }}" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
+              aria-label="Instagram"
+            >
+              {% render 'icon-instagram' %}
+            </a>
+          {% endif %}
+          
+          {% if settings.social_facebook_link != blank %}
+            <a 
+              href="{{ settings.social_facebook_link }}" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
+              aria-label="Facebook"
+            >
+              {% render 'icon-facebook' %}
+            </a>
+          {% endif %}
+          
+          {% if settings.social_tiktok_link != blank %}
+            <a 
+              href="{{ settings.social_tiktok_link }}" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
+              aria-label="TikTok"
+            >
+              {% render 'icon-tiktok' %}
+            </a>
+          {% endif %}
+          
+          {% if settings.social_snapchat_link != blank %}
+            <a 
+              href="{{ settings.social_snapchat_link }}" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gelatico-pink transition-all duration-300 hover:bg-gelatico-pink hover:text-white"
+              aria-label="Snapchat"
+            >
+              {% render 'icon-send' %}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="lg:col-span-1">
+        <h3 class="text-lg font-bold mb-6">Quick Links</h3>
+        <nav class="flex flex-col space-y-3">
+          {% for link in linklists.footer.links %}
+            <a href="{{ link.url }}" class="text-muted-foreground hover:text-gelatico-pink transition-colors duration-300">
+              {{ link.title }}
+            </a>
+          {% endfor %}
+        </nav>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="lg:col-span-1">
+        <h3 class="text-lg font-bold mb-6">Contact Us</h3>
+        <div class="space-y-4">
+          <div class="flex items-start space-x-3">
+            {% render 'icon-map-pin' %}
+            <p class="text-muted-foreground">
+              {{ settings.store_address | default: "Boulevard Mall, Salmiya, Kuwait" | newline_to_br }}
+            </p>
+          </div>
+          <div class="flex items-center space-x-3">
+            {% render 'icon-phone' %}
+            <p class="text-muted-foreground">
+              {{ settings.store_phone | default: "+965 2221 1234" }}
+            </p>
+          </div>
+          <div class="flex items-center space-x-3">
+            {% render 'icon-mail' %}
+            <p class="text-muted-foreground">
+              {{ settings.store_email | default: "hello@gelatico.kw" }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="lg:col-span-1">
+        <h3 class="text-lg font-bold mb-6">Newsletter</h3>
+        <p class="text-muted-foreground mb-4">
+          Sign up for our newsletter to receive updates and special offers.
+        </p>
+        {% form 'customer' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="relative">
+            <input 
+              type="email" 
+              name="contact[email]"
+              placeholder="Your email address" 
+              required
+              class="w-full px-4 py-3 pl-4 pr-12 rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-gelatico-pink"
+            >
+            <button 
+              type="submit" 
+              class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-gelatico-pink text-white rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 hover:bg-gelatico-pink/90"
+            >
+              {% render 'icon-mail' %}
+            </button>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+
+    <hr class="border-gelatico-baby-pink/30 my-12" />
+
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <p class="text-muted-foreground text-sm mb-4 md:mb-0">
+        &copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.
+      </p>
+      <div class="flex space-x-6">
+        {% for link in linklists.footer-secondary.links %}
+          <a href="{{ link.url }}" class="text-sm text-muted-foreground hover:text-gelatico-pink transition-colors duration-300">
+            {{ link.title }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "footer_text",
+      "label": "Footer text",
+      "default": "Artisanal gelato crafted with passion, bringing a taste of Italy to Kuwait."
+    },
+    {
+      "type": "text",
+      "id": "store_address",
+      "label": "Store address"
+    },
+    {
+      "type": "text",
+      "id": "store_phone",
+      "label": "Store phone number"
+    },
+    {
+      "type": "text",
+      "id": "store_email",
+      "label": "Store email"
+    }
+  ]
+}
+{% endschema %}

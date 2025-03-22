@@ -1,0 +1,141 @@
+
+<header class="fixed top-0 left-0 w-full z-50 transition-all duration-300 {% if template != 'index' %}py-2 bg-white/80 backdrop-blur-md shadow-sm{% else %}py-4 bg-transparent{% endif %}" data-header>
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 flex justify-between items-center">
+    <!-- Logo -->
+    <a href="/" class="relative z-10 transition-all duration-300 hover:opacity-80">
+      {% if settings.logo != blank %}
+        <img 
+          src="{{ settings.logo | img_url: 'medium' }}" 
+          alt="{{ shop.name }}" 
+          class="h-12 w-auto"
+        >
+      {% else %}
+        <h1 class="text-3xl font-bold font-gelatico text-gelatico-pink">{{ shop.name }}</h1>
+      {% endif %}
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex items-center space-x-8">
+      {% for link in linklists.main-menu.links %}
+        <a 
+          href="{{ link.url }}" 
+          class="text-sm font-medium transition-all duration-300 relative after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-gelatico-pink after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:text-gelatico-pink hover:after:scale-x-100 {% if link.active %}text-gelatico-pink after:scale-x-100{% else %}text-foreground{% endif %}"
+        >
+          {{ link.title }}
+        </a>
+      {% endfor %}
+
+      <a 
+        href="/cart" 
+        class="relative p-2 text-foreground transition-all duration-300 hover:text-gelatico-pink"
+      >
+        {% render 'icon-cart' %}
+        <span class="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-gelatico-pink rounded-full">
+          {{ cart.item_count }}
+        </span>
+      </a>
+    </nav>
+
+    <!-- Mobile: Menu Button & Cart -->
+    <div class="flex items-center space-x-4 md:hidden">
+      <a 
+        href="/cart" 
+        class="relative p-1 text-foreground transition-all duration-300 hover:text-gelatico-pink"
+      >
+        {% render 'icon-cart' %}
+        <span class="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-gelatico-pink rounded-full">
+          {{ cart.item_count }}
+        </span>
+      </a>
+      
+      <button
+        class="p-1 text-foreground transition-all duration-300 hover:text-gelatico-pink js-menu-toggle"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        {% render 'icon-menu' %}
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 bg-white z-40 flex flex-col items-center justify-center space-y-8 transition-all duration-300 opacity-0 translate-x-full pointer-events-none"
+    >
+      <button class="absolute top-4 right-4 p-1 text-foreground js-menu-close">
+        {% render 'icon-close' %}
+      </button>
+      
+      {% if settings.logo != blank %}
+        <img 
+          src="{{ settings.logo | img_url: 'medium' }}" 
+          alt="{{ shop.name }}" 
+          class="w-24 h-24 object-contain mb-4"
+        >
+      {% else %}
+        <h2 class="text-3xl font-bold font-gelatico text-gelatico-pink mb-4">{{ shop.name }}</h2>
+      {% endif %}
+      
+      {% for link in linklists.main-menu.links %}
+        <a
+          href="{{ link.url }}"
+          class="text-xl font-medium transition-all duration-300 {% if link.active %}text-gelatico-pink{% else %}text-foreground{% endif %}"
+        >
+          {{ link.title }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border",
+      "label": "Show border",
+      "default": false
+    }
+  ]
+}
+{% endschema %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Scroll detection for header appearance
+    const header = document.querySelector('[data-header]');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.remove('py-4', 'bg-transparent');
+        header.classList.add('py-2', 'bg-white/80', 'backdrop-blur-md', 'shadow-sm');
+      } else if (window.location.pathname === '/') {
+        header.classList.add('py-4', 'bg-transparent');
+        header.classList.remove('py-2', 'bg-white/80', 'backdrop-blur-md', 'shadow-sm');
+      }
+    });
+    
+    // Mobile menu toggle
+    const menuToggle = document.querySelector('.js-menu-toggle');
+    const menuClose = document.querySelector('.js-menu-close');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('opacity-0');
+      mobileMenu.classList.toggle('translate-x-full');
+      mobileMenu.classList.toggle('pointer-events-none');
+      menuToggle.setAttribute('aria-expanded', menuToggle.getAttribute('aria-expanded') === 'false' ? 'true' : 'false');
+    });
+    
+    menuClose.addEventListener('click', () => {
+      mobileMenu.classList.add('opacity-0', 'translate-x-full', 'pointer-events-none');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+</script>

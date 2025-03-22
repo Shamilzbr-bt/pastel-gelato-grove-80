@@ -1,0 +1,193 @@
+
+<div class="cart-drawer fixed inset-y-0 right-0 z-50 max-w-md w-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300">
+  <div class="flex flex-col h-full">
+    <div class="p-4 border-b flex justify-between items-center">
+      <h2 class="text-xl font-semibold">Your Cart ({{ cart.item_count }})</h2>
+      <button class="js-close-cart p-2 -mr-2 text-gray-500 hover:text-gelatico-pink transition-colors">
+        {% render 'icon-close' %}
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto p-4">
+      {% if cart.item_count > 0 %}
+        <div class="space-y-4">
+          {% for item in cart.items %}
+            <div class="flex gap-3 py-3 border-b">
+              <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                <img 
+                  src="{{ item.image | img_url: 'small' }}" 
+                  alt="{{ item.title }}" 
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              
+              <div class="flex-1">
+                <div class="flex justify-between">
+                  <h3 class="font-medium">{{ item.product.title }}</h3>
+                  <a 
+                    href="/cart/change?line={{ forloop.index }}&quantity=0"
+                    class="text-gray-400 hover:text-gelatico-pink"
+                    data-remove-item
+                    data-line="{{ forloop.index }}"
+                  >
+                    {% render 'icon-trash' %}
+                  </a>
+                </div>
+                
+                {% if item.variant.title != 'Default Title' %}
+                  <p class="text-sm text-gray-500">{{ item.variant.title }}</p>
+                {% endif %}
+                
+                <div class="flex justify-between items-center mt-2">
+                  <div class="flex items-center border rounded-full">
+                    <button
+                      class="h-6 w-6 flex items-center justify-center text-gray-500"
+                      data-cart-quantity-decrease
+                      data-line="{{ forloop.index }}"
+                      {% if item.quantity <= 1 %}disabled{% endif %}
+                    >
+                      {% render 'icon-minus' %}
+                    </button>
+                    <span class="w-6 text-center text-sm">{{ item.quantity }}</span>
+                    <button
+                      class="h-6 w-6 flex items-center justify-center text-gray-500"
+                      data-cart-quantity-increase
+                      data-line="{{ forloop.index }}"
+                    >
+                      {% render 'icon-plus' %}
+                    </button>
+                  </div>
+                  
+                  <span class="font-medium text-gelatico-pink">
+                    {{ item.final_line_price | money }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-12">
+          <div class="mb-4 text-gelatico-pink">
+            {% render 'icon-cart-empty' %}
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Your cart is empty</h3>
+          <p class="text-gray-500 mb-6">Add items to your cart to checkout</p>
+          <button class="js-close-cart gelatico-button-outline">Continue Shopping</button>
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if cart.item_count > 0 %}
+      <div class="border-t p-4">
+        <div class="mb-4 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Subtotal</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+          
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Shipping</span>
+            <span>
+              {% if cart.total_price >= 1500 %}
+                <span class="text-green-600">Free</span>
+              {% else %}
+                {{ 200 | money }}
+              {% endif %}
+            </span>
+          </div>
+          
+          <div class="flex justify-between font-semibold">
+            <span>Total</span>
+            <span>
+              {% if cart.total_price >= 1500 %}
+                {{ cart.total_price | money }}
+              {% else %}
+                {{ cart.total_price | plus: 200 | money }}
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        
+        <div class="space-y-2">
+          <a href="/cart" class="gelatico-button-outline w-full flex justify-center">
+            View Cart
+          </a>
+          <form action="/cart" method="post">
+            <button
+              type="submit"
+              name="checkout"
+              class="gelatico-button w-full flex justify-center"
+            >
+              Checkout
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle quantity changes
+    const quantityIncreaseButtons = document.querySelectorAll('[data-cart-quantity-increase]');
+    const quantityDecreaseButtons = document.querySelectorAll('[data-cart-quantity-decrease]');
+    
+    quantityIncreaseButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const line = this.getAttribute('data-line');
+        const quantityDisplay = this.previousElementSibling;
+        const currentQuantity = parseInt(quantityDisplay.textContent);
+        
+        updateCartItem(line, currentQuantity + 1);
+      });
+    });
+    
+    quantityDecreaseButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const line = this.getAttribute('data-line');
+        const quantityDisplay = this.nextElementSibling;
+        const currentQuantity = parseInt(quantityDisplay.textContent);
+        
+        if (currentQuantity > 1) {
+          updateCartItem(line, currentQuantity - 1);
+        }
+      });
+    });
+    
+    // Handle remove item
+    const removeButtons = document.querySelectorAll('[data-remove-item]');
+    
+    removeButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const line = this.getAttribute('data-line');
+        updateCartItem(line, 0);
+      });
+    });
+    
+    // Update cart item quantity via AJAX
+    function updateCartItem(line, quantity) {
+      fetch('/cart/change.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          line: line,
+          quantity: quantity
+        })
+      })
+      .then(response => response.json())
+      .then(cart => {
+        // Refresh the cart drawer
+        location.reload();
+      })
+      .catch(error => {
+        console.error('Error updating cart:', error);
+      });
+    }
+  });
+</script>

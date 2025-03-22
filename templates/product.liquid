@@ -1,0 +1,241 @@
+
+<div class="page-container pt-32">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="relative">
+      <div class="sticky top-32">
+        <div class="mb-4 overflow-hidden rounded-2xl">
+          <img 
+            src="{{ product.featured_image | img_url: '800x' }}" 
+            alt="{{ product.title }}" 
+            class="w-full h-auto"
+            id="ProductFeaturedImage"
+          />
+        </div>
+        
+        {% if product.images.size > 1 %}
+          <div class="flex flex-wrap gap-2 mt-4">
+            {% for image in product.images %}
+              <div 
+                class="w-20 h-20 rounded-lg overflow-hidden border-2 cursor-pointer product-thumbnail {% if forloop.first %}border-gelatico-pink{% else %}border-transparent{% endif %}" 
+                data-image-id="{{ image.id }}"
+                data-image-url="{{ image | img_url: '800x' }}"
+              >
+                <img src="{{ image | img_url: '100x' }}" alt="{{ image.alt | default: product.title }}" class="w-full h-full object-cover" />
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="product-info">
+      <span class="inline-block px-3 py-1 mb-4 rounded-full text-xs font-medium bg-gelatico-baby-pink/30 text-gelatico-pink">
+        {{ product.type }}
+      </span>
+      
+      <h1 class="text-3xl md:text-4xl font-bold font-gelatico mb-4">{{ product.title }}</h1>
+      
+      <div class="product-price text-2xl font-semibold text-gelatico-pink mb-6">
+        {{ product.price | money }}
+        {% if product.compare_at_price > product.price %}
+          <span class="text-gray-500 line-through ml-2 text-lg">{{ product.compare_at_price | money }}</span>
+        {% endif %}
+      </div>
+      
+      <div class="product-description prose mb-8">
+        {{ product.description }}
+      </div>
+      
+      <div class="product-tags mb-6">
+        {% for tag in product.tags %}
+          <span class="inline-block px-2 py-1 mr-2 mb-2 bg-gray-100 text-gray-800 text-xs rounded-full">
+            {{ tag }}
+          </span>
+        {% endfor %}
+      </div>
+      
+      <form action="/cart/add" method="post" id="AddToCartForm" class="mb-8">
+        {% if product.variants.size > 1 %}
+          <div class="mb-6">
+            <label for="ProductSelect" class="block text-sm font-medium mb-2">Variants</label>
+            <select name="id" id="ProductSelect" class="w-full p-3 rounded-lg border border-gray-300 focus:border-gelatico-pink focus:ring focus:ring-gelatico-pink/20 focus:outline-none">
+              {% for variant in product.variants %}
+                <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
+                  {{ variant.title }} - {{ variant.price | money }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        {% else %}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" />
+        {% endif %}
+        
+        <div class="mb-6">
+          <label for="Quantity" class="block text-sm font-medium mb-2">Quantity</label>
+          <div class="flex border rounded-lg w-32">
+            <button type="button" class="w-10 h-10 flex items-center justify-center border-r text-gray-600 hover:text-gelatico-pink" id="QuantityDecrease">-</button>
+            <input type="number" name="quantity" id="Quantity" value="1" min="1" class="w-12 text-center border-none focus:outline-none" />
+            <button type="button" class="w-10 h-10 flex items-center justify-center border-l text-gray-600 hover:text-gelatico-pink" id="QuantityIncrease">+</button>
+          </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button 
+            type="submit" 
+            name="add" 
+            id="AddToCart"
+            class="gelatico-button w-full sm:w-auto"
+            {% unless product.available %}disabled{% endunless %}
+          >
+            {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+          </button>
+          
+          <button 
+            type="button" 
+            id="BuyNowBtn"
+            class="gelatico-button-outline w-full sm:w-auto"
+            {% unless product.available %}disabled{% endunless %}
+          >
+            Buy Now
+          </button>
+        </div>
+      </form>
+      
+      <div class="shipping-info border-t border-b py-4 my-6">
+        <div class="flex items-start gap-3 mb-3">
+          {% render 'icon-truck' %}
+          <div>
+            <h4 class="font-medium">Free shipping</h4>
+            <p class="text-sm text-gray-600">On orders over 15 KWD</p>
+          </div>
+        </div>
+        
+        <div class="flex items-start gap-3">
+          {% render 'icon-refresh' %}
+          <div>
+            <h4 class="font-medium">Easy returns</h4>
+            <p class="text-sm text-gray-600">30 day return policy</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <section class="my-16">
+    <h2 class="text-3xl font-bold font-gelatico mb-8 text-center">You May Also Like</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for recommendation in recommendations.products %}
+        <div class="group overflow-hidden rounded-2xl transition-all duration-300 h-full">
+          <a href="{{ recommendation.url }}" class="block h-full w-full">
+            <div class="card h-full w-full">
+              <div class="relative aspect-square overflow-hidden">
+                <img 
+                  src="{{ recommendation.featured_image | img_url: 'medium' }}" 
+                  alt="{{ recommendation.title }}" 
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              </div>
+              
+              <div class="p-4">
+                <h3 class="text-md font-bold font-gelatico mb-2 group-hover:text-gelatico-pink transition-colors duration-300">
+                  {{ recommendation.title }}
+                </h3>
+                
+                <div class="flex items-center justify-between mt-2">
+                  <span class="text-sm font-semibold text-gelatico-pink">
+                    {{ recommendation.price | money }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Quantity Selector
+    const quantityInput = document.getElementById('Quantity');
+    const decreaseBtn = document.getElementById('QuantityDecrease');
+    const increaseBtn = document.getElementById('QuantityIncrease');
+    
+    if (decreaseBtn && increaseBtn && quantityInput) {
+      decreaseBtn.addEventListener('click', function() {
+        let value = parseInt(quantityInput.value);
+        if (value > 1) {
+          quantityInput.value = value - 1;
+        }
+      });
+      
+      increaseBtn.addEventListener('click', function() {
+        let value = parseInt(quantityInput.value);
+        quantityInput.value = value + 1;
+      });
+    }
+    
+    // Product Thumbnails
+    const featuredImage = document.getElementById('ProductFeaturedImage');
+    const thumbnails = document.querySelectorAll('.product-thumbnail');
+    
+    if (featuredImage && thumbnails.length > 0) {
+      thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', function() {
+          const imageUrl = this.getAttribute('data-image-url');
+          featuredImage.src = imageUrl;
+          
+          // Update active state
+          thumbnails.forEach(thumb => {
+            thumb.classList.remove('border-gelatico-pink');
+            thumb.classList.add('border-transparent');
+          });
+          this.classList.add('border-gelatico-pink');
+          this.classList.remove('border-transparent');
+        });
+      });
+    }
+    
+    // Buy Now Button
+    const buyNowBtn = document.getElementById('BuyNowBtn');
+    const addToCartForm = document.getElementById('AddToCartForm');
+    
+    if (buyNowBtn && addToCartForm) {
+      buyNowBtn.addEventListener('click', function() {
+        // Create a new form element
+        const buyNowForm = document.createElement('form');
+        buyNowForm.method = 'post';
+        buyNowForm.action = '/cart/add';
+        
+        // Create a hidden input for the variant ID
+        const variantInput = document.createElement('input');
+        variantInput.type = 'hidden';
+        variantInput.name = 'id';
+        variantInput.value = document.querySelector('select[name="id"]')?.value || 
+                             document.querySelector('input[name="id"]').value;
+        
+        // Create a hidden input for the quantity
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = document.getElementById('Quantity').value;
+        
+        // Create a hidden input to redirect to checkout
+        const checkoutInput = document.createElement('input');
+        checkoutInput.type = 'hidden';
+        checkoutInput.name = 'checkout';
+        checkoutInput.value = '';
+        
+        // Append inputs to the form
+        buyNowForm.appendChild(variantInput);
+        buyNowForm.appendChild(quantityInput);
+        buyNowForm.appendChild(checkoutInput);
+        
+        // Append the form to the body and submit
+        document.body.appendChild(buyNowForm);
+        buyNowForm.submit();
+      });
+    }
+  });
+</script>

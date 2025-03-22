@@ -1,0 +1,167 @@
+
+<div class="page-container pt-32">
+  <div class="text-center mb-12">
+    <span class="inline-block px-4 py-1 mb-4 rounded-full bg-gelatico-baby-pink/30 text-gelatico-pink text-sm font-medium uppercase tracking-wider">
+      Your Cart
+    </span>
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold font-gelatico mb-6">
+      Shopping Cart
+    </h1>
+  </div>
+  
+  {% if cart.item_count > 0 %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold">Items ({{ cart.item_count }})</h2>
+          <a 
+            href="/cart/clear"
+            class="text-sm text-muted-foreground hover:text-gelatico-pink transition-colors duration-300 flex items-center"
+          >
+            {% render 'icon-trash' %}
+            <span class="ml-1">Clear Cart</span>
+          </a>
+        </div>
+        
+        <div class="space-y-4">
+          {% for item in cart.items %}
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+              <div class="flex gap-3">
+                <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <img 
+                    src="{{ item.image | img_url: 'medium' }}" 
+                    alt="{{ item.title }}" 
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                
+                <div class="flex-1">
+                  <div class="flex justify-between">
+                    <div>
+                      <h3 class="font-medium text-lg">{{ item.product.title }}</h3>
+                      {% if item.variant.title != 'Default Title' %}
+                        <p class="text-sm text-muted-foreground">{{ item.variant.title }}</p>
+                      {% endif %}
+                    </div>
+                    <a
+                      href="/cart/change?line={{ forloop.index }}&quantity=0"
+                      class="text-muted-foreground hover:text-destructive transition-colors"
+                      aria-label="Remove item"
+                    >
+                      {% render 'icon-trash' %}
+                    </a>
+                  </div>
+                  
+                  <div class="flex justify-between items-center mt-3">
+                    <form action="/cart/change" method="post" class="cart__update-wrapper">
+                      <input type="hidden" name="line" value="{{ forloop.index }}">
+                      <div class="flex items-center border rounded-full">
+                        <button
+                          type="submit"
+                          name="quantity"
+                          value="{{ item.quantity | minus: 1 }}"
+                          class="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-gelatico-pink transition-colors"
+                          aria-label="Decrease quantity"
+                          {% if item.quantity <= 1 %}disabled{% endif %}
+                        >
+                          {% render 'icon-minus' %}
+                        </button>
+                        <span class="w-8 text-center">{{ item.quantity }}</span>
+                        <button
+                          type="submit"
+                          name="quantity"
+                          value="{{ item.quantity | plus: 1 }}"
+                          class="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-gelatico-pink transition-colors"
+                          aria-label="Increase quantity"
+                        >
+                          {% render 'icon-plus' %}
+                        </button>
+                      </div>
+                    </form>
+                    
+                    <div class="text-right">
+                      <span class="font-medium text-gelatico-pink">
+                        {{ item.final_line_price | money }}
+                      </span>
+                      <div class="text-xs text-muted-foreground">
+                        {{ item.final_price | money }} each
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <div class="bg-muted/10 p-6 rounded-2xl border border-muted h-fit">
+        <h2 class="text-xl font-semibold mb-6">Order Summary</h2>
+        
+        <div class="space-y-4 mb-6">
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">Subtotal</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
+          
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">Shipping</span>
+            <span>
+              {% if cart.total_price >= 1500 %}
+                <span class="text-green-600">Free</span>
+              {% else %}
+                {{ 200 | money }}
+              {% endif %}
+            </span>
+          </div>
+          
+          {% if cart.total_price < 1500 %}
+            <div class="text-sm text-muted-foreground">
+              Free shipping on orders over {{ 1500 | money }}
+            </div>
+          {% endif %}
+          
+          <div class="border-t border-muted pt-4 flex justify-between font-semibold">
+            <span>Total</span>
+            <span>
+              {% if cart.total_price >= 1500 %}
+                {{ cart.total_price | money }}
+              {% else %}
+                {{ cart.total_price | plus: 200 | money }}
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        
+        <form action="/cart" method="post">
+          <button
+            type="submit"
+            name="checkout"
+            class="w-full flex items-center justify-center gelatico-button"
+          >
+            Checkout
+            {% render 'icon-arrow-right' %}
+          </button>
+        </form>
+        
+        <div class="mt-4">
+          <a 
+            href="/collections/all" 
+            class="text-sm text-center block text-muted-foreground hover:text-gelatico-pink transition-colors duration-300"
+          >
+            Continue Shopping
+          </a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center py-16">
+      <div class="mb-6 text-gelatico-pink">
+        {% render 'icon-cart-empty' %}
+      </div>
+      <h2 class="text-2xl font-gelatico mb-3">Your cart is empty</h2>
+      <p class="text-muted-foreground mb-8">Looks like you haven't added any items to your cart yet.</p>
+      <a href="/collections/all" class="gelatico-button">Start Shopping</a>
+    </div>
+  {% endif %}
+</div>

@@ -1,0 +1,144 @@
+
+<section class="py-16 md:py-24 bg-white">
+  <div class="page-container">
+    <div class="text-center mb-12">
+      <span class="inline-block px-4 py-1 mb-4 rounded-full bg-gelatico-baby-pink/30 text-gelatico-pink text-sm font-medium uppercase tracking-wider">
+        {{ section.settings.highlight_text }}
+      </span>
+      <h2 class="text-4xl sm:text-5xl md:text-6xl font-bold font-gelatico mb-6">
+        {{ section.settings.title }}
+      </h2>
+      <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+        {{ section.settings.description }}
+      </p>
+    </div>
+    
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for block in section.blocks %}
+          {% if block.type == 'testimonial' %}
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+              <div class="flex items-center mb-4">
+                {% if block.settings.rating > 0 %}
+                  <div class="flex text-gelatico-pink mb-2">
+                    {% for i in (1..5) %}
+                      {% if i <= block.settings.rating %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <p class="text-gray-700 mb-8">"{{ block.settings.quote }}"</p>
+              
+              <div class="flex items-center">
+                {% if block.settings.avatar %}
+                  <img 
+                    src="{{ block.settings.avatar | img_url: '60x60', crop: 'center' }}" 
+                    alt="{{ block.settings.author }}" 
+                    class="w-12 h-12 rounded-full object-cover mr-4"
+                  >
+                {% endif %}
+                <div>
+                  <h4 class="font-bold text-lg">{{ block.settings.author }}</h4>
+                  <p class="text-sm text-gray-500">{{ block.settings.author_info }}</p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "testimonials-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "highlight_text",
+      "label": "Highlight Text",
+      "default": "Customer Love"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "See what our happy customers have to say about their Gelatico experience."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Rating",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "The best gelato I've had outside of Italy! The flavors are rich, authentic, and simply divine. I love the seasonal specials they offer."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author",
+          "default": "Sarah Johnson"
+        },
+        {
+          "type": "text",
+          "id": "author_info",
+          "label": "Author Info",
+          "default": "Regular Customer"
+        },
+        {
+          "type": "image_picker",
+          "id": "avatar",
+          "label": "Author Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
