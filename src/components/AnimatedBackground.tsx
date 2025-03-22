@@ -35,11 +35,12 @@ function GelatoSphere({ position, scale, color, speed, distort }: {
 }
 
 function AnimatedScene() {
+  // Explicitly type the positions as tuples with [number, number, number]
   const shapeProps = [
-    { position: [-3, 0, -5], scale: 1.3, color: "#FFD1DC", speed: 0.5, distort: 0.4 },
-    { position: [3.5, 0, -3], scale: 0.8, color: "#EC5C9D", speed: 0.6, distort: 0.5 },
-    { position: [-2, 1, -1], scale: 0.6, color: "#A7C7E7", speed: 0.7, distort: 0.3 },
-    { position: [2, -1, -2], scale: 0.9, color: "#FFF5E1", speed: 0.4, distort: 0.6 },
+    { position: [-3, 0, -5] as [number, number, number], scale: 1.3, color: "#FFD1DC", speed: 0.5, distort: 0.4 },
+    { position: [3.5, 0, -3] as [number, number, number], scale: 0.8, color: "#EC5C9D", speed: 0.6, distort: 0.5 },
+    { position: [-2, 1, -1] as [number, number, number], scale: 0.6, color: "#A7C7E7", speed: 0.7, distort: 0.3 },
+    { position: [2, -1, -2] as [number, number, number], scale: 0.9, color: "#FFF5E1", speed: 0.4, distort: 0.6 },
   ];
 
   return (
