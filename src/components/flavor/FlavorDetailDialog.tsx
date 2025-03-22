@@ -24,7 +24,7 @@ export default function FlavorDetailDialog({ flavor, onAddToCart }: FlavorDetail
   };
   
   return (
-    <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+    <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-white">
       <div className="relative aspect-video">
         <img 
           src={cleanImagePath(flavor.image)} 

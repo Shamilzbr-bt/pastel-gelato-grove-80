@@ -78,7 +78,10 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
                       variant="outline" 
                       size="icon" 
                       className="rounded-full border-gelatico-pink text-gelatico-pink hover:bg-gelatico-baby-pink hover:bg-opacity-20"
-                      onClick={(e) => e.preventDefault()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
                     >
                       <Info size={18} />
                     </Button>
