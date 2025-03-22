@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { toast } from "sonner";
-import { shopifyService } from '@/services/shopify';
 import { useCart } from '@/hooks/useCart';
 import CartItemList from '@/components/cart/CartItemList';
 import OrderSummary from '@/components/cart/OrderSummary';
 import EmptyCart from '@/components/cart/EmptyCart';
+import { checkoutService } from '@/services/checkout';
 
 export default function Cart() {
   const { 
@@ -32,18 +32,21 @@ export default function Cart() {
     setIsCheckingOut(true);
     
     try {
-      const response = await shopifyService.createCheckout(cartItems);
+      const response = await checkoutService.processCheckout(cartItems);
       
-      if (response.success && response.checkoutUrl) {
-        toast.success("Redirecting to secure checkout...");
+      if (response.success) {
+        toast.success("Order processed successfully!");
         
-        // Redirect to Shopify checkout
-        window.location.href = response.checkoutUrl;
-      } else if (!response.success) {
+        // Clear the cart after successful checkout
+        clearCart();
+        
+        // Navigate to success page
+        navigate(`/checkout-success?orderId=${response.orderId}`);
+      } else {
         toast.error(response.error || "There was a problem processing your order");
       }
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      console.error('Error processing checkout:', error);
       toast.error("There was a problem processing your order. Please try again.");
     } finally {
       setIsCheckingOut(false);

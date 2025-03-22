@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Locations from "./pages/Locations";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/locations" element={<Locations />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout-success" element={<CheckoutSuccess />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
