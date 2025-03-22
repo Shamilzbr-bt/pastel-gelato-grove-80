@@ -53,8 +53,8 @@ export default function AboutSection() {
           <motion.div variants={itemVariants} className="relative">
             <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-soft">
               <img
-                src="/lovable-uploads/47544c31-489b-43d9-bea9-70fb1cc17910.png"
-                alt="Artisanal gelato box"
+                src="/lovable-uploads/6172e215-ce04-45ed-81e8-0d5da45904d9.png"
+                alt="Artisanal gelato preparation"
                 className="w-full h-full object-cover"
               />
             </div>

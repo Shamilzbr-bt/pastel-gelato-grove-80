@@ -34,7 +34,7 @@ export default function About() {
         <StorySection
           title="Our Beginning"
           description="Gelatico was born from a simple yet powerful idea: to create the most authentic and delicious gelato outside of Italy. Our founder, Sophia, fell in love with gelato during her years studying culinary arts in Florence. Trained by renowned Italian gelato maestros, she learned the traditional techniques and recipes that had been passed down through generations."
-          image="https://images.unsplash.com/photo-1579954115567-dff2eeb6fdeb?q=80&w=1170&auto=format&fit=crop"
+          image="/lovable-uploads/47544c31-489b-43d9-bea9-70fb1cc17910.png"
           imageAlt="Gelatico founder making gelato"
           reverse={false}
         />
@@ -43,7 +43,7 @@ export default function About() {
         <StorySection
           title="Our Philosophy"
           description="At Gelatico, we believe that exceptional gelato comes from exceptional ingredients. We source locally whenever possible, partnering with farmers who share our commitment to quality and sustainability. Every flavor is handcrafted in small batches daily, ensuring that each scoop offers the perfect texture and taste experience. We never use artificial preservatives, colors, or flavors – just real, honest ingredients prepared with expertise and care."
-          image="https://images.unsplash.com/photo-1529589789467-4a12ccb8e5ff?q=80&w=1170&auto=format&fit=crop"
+          image="/lovable-uploads/ebbb6106-1761-4374-8ba5-846c648acc22.png"
           imageAlt="Fresh ingredients for gelato"
           reverse={true}
         />
@@ -52,7 +52,7 @@ export default function About() {
         <StorySection
           title="Our Commitment"
           description="Sustainability isn't just a buzzword for us – it's a core value that guides everything we do. From our biodegradable packaging to our energy-efficient production processes, we're constantly looking for ways to reduce our environmental footprint. We also believe in giving back to our community, which is why a portion of every purchase goes to supporting local food security initiatives and education programs."
-          image="https://images.unsplash.com/photo-1651950883237-0e422aa8a5cd?q=80&w=1287&auto=format&fit=crop"
+          image="/lovable-uploads/d520fc48-b67a-4391-bbce-95a3f93c8450.png"
           imageAlt="Eco-friendly packaging and sustainable practices"
           reverse={false}
         />
@@ -108,17 +108,17 @@ export default function About() {
             <TeamMember
               name="Sophia Martinez"
               role="Founder & Head Gelato Chef"
-              image="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1122&auto=format&fit=crop"
+              image="/lovable-uploads/3e7425e2-b89a-494a-ad3c-654d86a90ec6.png"
             />
             <TeamMember
               name="Marco Rossi"
               role="Master Flavor Developer"
-              image="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=1287&auto=format&fit=crop"
+              image="/lovable-uploads/5711393c-4796-46a9-a939-478166f02cbf.png"
             />
             <TeamMember
               name="Emma Chen"
               role="Operations Director"
-              image="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1288&auto=format&fit=crop"
+              image="/lovable-uploads/bef4f851-ea34-4b80-ae6b-5f8094f7fe6c.png"
             />
           </div>
         </section>
