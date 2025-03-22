@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -6,7 +5,6 @@ import Hero from '@/components/Hero';
 import { Flavor } from '@/models/Flavor';
 import AboutSection from '@/components/AboutSection';
 import FlavorGrid from '@/components/FlavorGrid';
-import PopularToppings from '@/components/PopularToppings';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
@@ -70,9 +68,6 @@ const Index = () => {
           </Link>
         </div>
       </section>
-      
-      {/* Add Popular Toppings Section */}
-      <PopularToppings />
 
       <Footer />
     </>
