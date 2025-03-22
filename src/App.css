@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -49,19 +50,19 @@
   letter-spacing: 5px;
   text-transform: uppercase;
   cursor: pointer;
-  color: #EC5C9D;
+  color: #d82a59;
   transition: all 1000ms;
   font-size: 15px;
   position: relative;
   overflow: hidden;
-  outline: 2px solid #EC5C9D;
+  outline: 2px solid #d82a59;
 }
 
 .uiverse-button:hover {
   color: #ffffff;
   transform: scale(1.1);
-  outline: 2px solid rgba(236, 92, 157, 0.7);
-  box-shadow: 4px 5px 17px -4px rgba(236, 92, 157, 0.8);
+  outline: 2px solid #f274a1;
+  box-shadow: 4px 5px 17px -4px #bc1a41;
 }
 
 .uiverse-button::before {
@@ -71,7 +72,7 @@
   top: 0;
   width: 0;
   height: 100%;
-  background-color: #EC5C9D;
+  background-color: #d82a59;
   transform: skewX(45deg);
   z-index: -1;
   transition: width 1000ms;

@@ -14,7 +14,7 @@ const toggleVariants = cva(
         outline:
           "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
         uiverse: 
-          "relative overflow-hidden text-primary outline outline-2 outline-primary hover:text-white hover:outline-primary/70 hover:shadow-[4px_5px_17px_-4px_rgba(236,92,157,0.8)] hover:scale-[1.1] transition-all duration-1000 before:absolute before:content-[''] before:left-[-50px] before:top-0 before:w-0 before:h-full before:bg-primary before:skew-x-[45deg] before:-z-10 before:transition-[width] before:duration-1000 hover:before:w-[250%] data-[state=on]:bg-primary data-[state=on]:text-white",
+          "relative overflow-hidden text-[#d82a59] outline outline-2 outline-[#d82a59] hover:text-white hover:outline-[#f274a1] hover:shadow-[4px_5px_17px_-4px_#bc1a41] hover:scale-[1.1] transition-all duration-1000 before:absolute before:content-[''] before:left-[-50px] before:top-0 before:w-0 before:h-full before:bg-[#d82a59] before:skew-x-[45deg] before:-z-10 before:transition-[width] before:duration-1000 hover:before:w-[250%] data-[state=on]:bg-[#d82a59] data-[state=on]:text-white",
       },
       size: {
         default: "h-10 px-3",
