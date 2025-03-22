@@ -21,13 +21,25 @@ serve(async (req) => {
   }
 
   try {
+    // Log to help with debugging
+    console.log('Edge function received request');
+    
     const { action, data } = await req.json();
+    console.log(`Processing action: ${action}`);
+    
+    // Debug environment variables (without exposing sensitive data)
+    console.log(`SHOPIFY_STORE_URL is set: ${!!SHOPIFY_STORE_URL}`);
+    console.log(`SHOPIFY_API_KEY is set: ${!!SHOPIFY_API_KEY}`);
+    console.log(`SHOPIFY_API_SECRET is set: ${!!SHOPIFY_API_SECRET}`);
 
     // Base headers for all Shopify API requests
     const headers = {
       'Content-Type': 'application/json',
       'X-Shopify-Access-Token': SHOPIFY_API_SECRET,
     };
+
+    // Log the headers being used (without the actual secret)
+    console.log('Using headers:', { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': '[REDACTED]' });
 
     let result;
     const baseUrl = `https://${SHOPIFY_STORE_URL}/admin/api/2023-10`;
@@ -36,7 +48,10 @@ serve(async (req) => {
     switch (action) {
       case 'getProducts':
         console.log('Fetching products from Shopify');
-        const productsResponse = await fetch(`${baseUrl}/products.json`, {
+        const productsUrl = `${baseUrl}/products.json`;
+        console.log(`Making request to: ${productsUrl}`);
+        
+        const productsResponse = await fetch(productsUrl, {
           method: 'GET',
           headers,
         });
@@ -54,7 +69,10 @@ serve(async (req) => {
       case 'getProduct':
         const { productId } = data;
         console.log(`Fetching product with ID: ${productId}`);
-        const productResponse = await fetch(`${baseUrl}/products/${productId}.json`, {
+        const productUrl = `${baseUrl}/products/${productId}.json`;
+        console.log(`Making request to: ${productUrl}`);
+        
+        const productResponse = await fetch(productUrl, {
           method: 'GET',
           headers,
         });
@@ -73,30 +91,49 @@ serve(async (req) => {
         const { items, email, address } = data;
         console.log('Creating checkout with items:', items);
         
-        // Create a checkout instead of a draft order for better user experience
-        const checkoutResponse = await fetch(`${baseUrl}/checkouts.json`, {
+        if (!items || items.length === 0) {
+          throw new Error('No items provided for checkout');
+        }
+        
+        // Create a checkout request
+        const checkoutUrl = `${baseUrl}/checkouts.json`;
+        console.log(`Making request to: ${checkoutUrl}`);
+        
+        const checkoutPayload = {
+          checkout: {
+            line_items: items.map(item => ({
+              variant_id: item.variantId,
+              quantity: item.quantity
+            })),
+            email: email || '',
+            shipping_address: address || {}
+          }
+        };
+        
+        console.log('Checkout payload:', JSON.stringify(checkoutPayload));
+        
+        const checkoutResponse = await fetch(checkoutUrl, {
           method: 'POST',
           headers,
-          body: JSON.stringify({
-            checkout: {
-              line_items: items.map(item => ({
-                variant_id: item.variantId,
-                quantity: item.quantity
-              })),
-              email: email || '',
-              shipping_address: address || {}
-            }
-          })
+          body: JSON.stringify(checkoutPayload)
         });
         
+        // Get response status and handle errors
+        const status = checkoutResponse.status;
+        console.log(`Checkout response status: ${status}`);
+        
         if (!checkoutResponse.ok) {
-          const errorData = await checkoutResponse.text();
-          console.error('Shopify checkout error:', errorData);
-          throw new Error(`Failed to create checkout: ${checkoutResponse.status}`);
+          const errorText = await checkoutResponse.text();
+          console.error('Shopify checkout error:', errorText);
+          return new Response(
+            JSON.stringify({ error: `Failed to create checkout: ${status}` }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
         
         // Get the checkout data
         const checkoutData = await checkoutResponse.json();
+        console.log('Checkout created successfully:', checkoutData);
         
         // Generate the checkout web URL
         if (checkoutData.checkout && checkoutData.checkout.token) {
