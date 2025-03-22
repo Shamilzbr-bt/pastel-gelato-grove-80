@@ -23,7 +23,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-hover transition-all duration-300"
+      className="overflow-hidden uiverse-card"
     >
       <div className="aspect-square relative overflow-hidden">
         <img 
@@ -39,13 +39,13 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       </div>
       
       <div className="p-5">
-        <h3 className="text-lg font-bold mb-2">{product.title}</h3>
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+        <h3 className="heading text-lg font-bold mb-2">{product.title}</h3>
+        <p className="text-white text-sm mb-4 line-clamp-2">
           {product.description}
         </p>
         
         <div className="flex items-center justify-between">
-          <span className="text-lg font-semibold">
+          <span className="text-lg font-semibold text-white">
             {formatPrice(parsePrice(product.variants[0]?.price || '0'))}
           </span>
           <button

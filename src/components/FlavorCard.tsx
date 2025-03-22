@@ -32,7 +32,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
       className={cn(
         "group overflow-hidden",
         layout === 'grid' 
-          ? "h-full rounded-2xl transition-all duration-300 shadow-soft hover:shadow-hover"
+          ? "h-full rounded-2xl transition-all duration-300"
           : "flex flex-col md:flex-row items-start gap-8 my-12 p-6 rounded-3xl bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-sm shadow-soft"
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -40,7 +40,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
     >
       <Link 
         to={`/flavors/${flavor.id}`} 
-        className="block h-full"
+        className={cn("block h-full", layout === 'grid' ? "uiverse-card" : "")}
         onClick={(e) => e.stopPropagation()}
       >
         <FlavorImage 
@@ -54,7 +54,7 @@ export default function FlavorCard({ flavor, layout = 'grid' }: FlavorCardProps)
           "p-4",
           layout === 'featured' && "md:flex-1"
         )}>
-          <h3 className="text-xl font-bold font-gelatico mb-2 group-hover:text-gelatico-pink transition-colors duration-300">
+          <h3 className="heading text-xl font-bold font-gelatico mb-2 group-hover:text-gelatico-pink transition-colors duration-300">
             {flavor.name}
           </h3>
           
