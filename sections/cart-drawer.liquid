@@ -1,0 +1,190 @@
+
+<div id="cart-drawer-container" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/25 js-cart-overlay"></div>
+  
+  <div class="absolute top-0 right-0 w-full max-w-md h-full bg-white shadow-xl flex flex-col transform translate-x-full transition-transform duration-300 js-cart-drawer">
+    <div class="p-4 border-b flex items-center justify-between">
+      <h2 class="text-xl font-bold">Your Cart</h2>
+      <button class="p-2 text-gray-500 hover:text-gray-700 js-close-cart">
+        {% render 'icon-close' %}
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto p-4 cart-items-container">
+      {% if cart.item_count == 0 %}
+        <div class="flex flex-col items-center justify-center h-full text-center">
+          {% render 'icon-cart-empty' %}
+          <h3 class="text-lg font-medium mt-4">Your cart is empty</h3>
+          <p class="text-muted-foreground mt-2">Looks like you haven't added any products to your cart yet.</p>
+          <a href="/collections/all" class="gelatico-button mt-6">Start Shopping</a>
+        </div>
+      {% else %}
+        <div class="space-y-4">
+          {% for item in cart.items %}
+            <div class="flex items-start border-b pb-4">
+              <div class="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                <img src="{{ item.image | img_url: '120x120', crop: 'center' }}" alt="{{ item.title | escape }}" class="w-full h-full object-cover">
+              </div>
+              
+              <div class="ml-4 flex-grow">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="font-medium text-sm">{{ item.product.title }}</h4>
+                    <p class="text-xs text-muted-foreground">
+                      {% if item.variant.title != 'Default Title' %}
+                        {{ item.variant.title }}
+                      {% endif %}
+                    </p>
+                    <p class="text-xs text-muted-foreground mt-1">{{ item.price | money }}</p>
+                  </div>
+                  
+                  <a href="/cart/change?line={{ forloop.index }}&quantity=0" class="text-gray-400 hover:text-gray-600">
+                    {% render 'icon-trash' %}
+                  </a>
+                </div>
+                
+                <div class="flex items-center mt-2">
+                  <div class="flex items-center border rounded-full">
+                    <a href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | minus: 1 }}" class="px-2 py-1">
+                      {% render 'icon-minus' %}
+                    </a>
+                    <span class="px-2 text-sm">{{ item.quantity }}</span>
+                    <a href="/cart/change?line={{ forloop.index }}&quantity={{ item.quantity | plus: 1 }}" class="px-2 py-1">
+                      {% render 'icon-plus' %}
+                    </a>
+                  </div>
+                  
+                  <div class="ml-auto font-medium">
+                    {{ item.original_line_price | money }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if cart.item_count > 0 %}
+      <div class="p-4 border-t mt-auto">
+        <div class="flex justify-between mb-2">
+          <span class="text-muted-foreground">Subtotal</span>
+          <span class="font-medium">{{ cart.total_price | money }}</span>
+        </div>
+        <p class="text-xs text-muted-foreground mb-4">Shipping and taxes calculated at checkout</p>
+        
+        <a href="/checkout" class="gelatico-button w-full text-center block">
+          Proceed to Checkout
+        </a>
+        
+        <button class="mt-2 text-sm text-center w-full text-muted-foreground hover:text-foreground js-close-cart">
+          Continue Shopping
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const cartDrawerContainer = document.getElementById('cart-drawer-container');
+    const cartDrawer = document.querySelector('.js-cart-drawer');
+    const overlay = document.querySelector('.js-cart-overlay');
+    const closeButtons = document.querySelectorAll('.js-close-cart');
+    
+    // Function to open cart drawer
+    window.openCartDrawer = function() {
+      if (cartDrawerContainer) {
+        cartDrawerContainer.classList.remove('hidden');
+        setTimeout(() => {
+          cartDrawer.classList.remove('translate-x-full');
+        }, 10);
+        document.body.classList.add('overflow-hidden');
+      }
+    };
+    
+    // Function to close cart drawer
+    window.closeCartDrawer = function() {
+      if (cartDrawerContainer) {
+        cartDrawer.classList.add('translate-x-full');
+        setTimeout(() => {
+          cartDrawerContainer.classList.add('hidden');
+        }, 300);
+        document.body.classList.remove('overflow-hidden');
+      }
+    };
+    
+    // Open cart when clicking cart icons
+    document.querySelectorAll('a[href="/cart"]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.openCartDrawer();
+      });
+    });
+    
+    // Close cart when clicking close buttons
+    closeButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        window.closeCartDrawer();
+      });
+    });
+    
+    // Close cart when clicking overlay
+    if (overlay) {
+      overlay.addEventListener('click', function() {
+        window.closeCartDrawer();
+      });
+    }
+    
+    // Update cart when add to cart is clicked (with AJAX)
+    document.body.addEventListener('click', function(e) {
+      const addToCartButton = e.target.closest('button[type="submit"]');
+      if (addToCartButton && addToCartButton.closest('form[action="/cart/add"]')) {
+        const form = addToCartButton.closest('form');
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Refresh cart contents
+          fetch('/cart.js')
+            .then(response => response.json())
+            .then(cart => {
+              // Update cart count
+              document.querySelectorAll('.cart-count').forEach(el => {
+                el.textContent = cart.item_count;
+              });
+              
+              // Open cart drawer
+              window.openCartDrawer();
+              
+              // Refresh cart drawer contents
+              fetch('/?section_id=cart-drawer')
+                .then(response => response.text())
+                .then(html => {
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(html, 'text/html');
+                  const newCartDrawer = doc.getElementById('cart-drawer-container');
+                  document.getElementById('cart-drawer-container').innerHTML = newCartDrawer.innerHTML;
+                });
+            });
+        })
+        .catch(error => {
+          console.error('Error adding item to cart:', error);
+        });
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Cart Drawer",
+  "settings": []
+}
+{% endschema %}

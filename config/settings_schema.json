@@ -4,7 +4,7 @@
     "name": "theme_info",
     "theme_name": "Gelatico",
     "theme_version": "1.0.0",
-    "theme_author": "Gelatico",
+    "theme_author": "Gelatico Team",
     "theme_documentation_url": "",
     "theme_support_url": ""
   },
@@ -13,37 +13,31 @@
     "settings": [
       {
         "type": "header",
-        "content": "Branding"
+        "content": "Primary colors"
       },
       {
         "type": "color",
-        "id": "gelatico_pink",
-        "label": "Gelatico Pink",
-        "default": "#EC5C9D"
+        "id": "color_primary",
+        "label": "Primary",
+        "default": "#FF6B95"
       },
       {
         "type": "color",
-        "id": "gelatico_baby_pink",
-        "label": "Baby Pink",
+        "id": "color_secondary",
+        "label": "Secondary",
         "default": "#FFD1DC"
       },
       {
         "type": "color",
-        "id": "gelatico_peach_cream",
-        "label": "Peach Cream",
-        "default": "#FFF5E1"
+        "id": "color_background",
+        "label": "Background",
+        "default": "#FFFFFF"
       },
       {
         "type": "color",
-        "id": "gelatico_soft_blue",
-        "label": "Soft Blue",
-        "default": "#A7C7E7"
-      },
-      {
-        "type": "color",
-        "id": "gelatico_light_yellow",
-        "label": "Light Yellow",
-        "default": "#FFF9E6"
+        "id": "color_text",
+        "label": "Text",
+        "default": "#333333"
       }
     ]
   },
@@ -55,38 +49,30 @@
         "content": "Headings"
       },
       {
-        "type": "select",
+        "type": "font_picker",
         "id": "heading_font",
-        "label": "Font Family",
-        "options": [
-          {
-            "value": "playfair_display",
-            "label": "Playfair Display"
-          }
-        ],
-        "default": "playfair_display"
+        "label": "Font",
+        "default": "playfair_display_n7"
       },
       {
         "type": "header",
-        "content": "Body Text"
+        "content": "Body text"
       },
       {
-        "type": "select",
+        "type": "font_picker",
         "id": "body_font",
-        "label": "Font Family",
-        "options": [
-          {
-            "value": "poppins",
-            "label": "Poppins"
-          }
-        ],
-        "default": "poppins"
+        "label": "Font",
+        "default": "poppins_n4"
       }
     ]
   },
   {
     "name": "Social Media",
     "settings": [
+      {
+        "type": "header",
+        "content": "Social accounts"
+      },
       {
         "type": "text",
         "id": "social_instagram_link",
@@ -110,6 +96,32 @@
         "id": "social_snapchat_link",
         "label": "Snapchat",
         "info": "https://snapchat.com/add/youraccount"
+      }
+    ]
+  },
+  {
+    "name": "Footer",
+    "settings": [
+      {
+        "type": "text",
+        "id": "footer_text",
+        "label": "Footer text",
+        "default": "Artisanal gelato crafted with passion, bringing a taste of Italy to Kuwait."
+      },
+      {
+        "type": "text",
+        "id": "store_address",
+        "label": "Store address"
+      },
+      {
+        "type": "text",
+        "id": "store_phone",
+        "label": "Store phone number"
+      },
+      {
+        "type": "text",
+        "id": "store_email",
+        "label": "Store email"
       }
     ]
   }

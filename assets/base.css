@@ -1,0 +1,148 @@
+
+/* Base styles for Gelatico theme */
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #333333;
+  --color-gelatico-pink: #FF6B95;
+  --color-gelatico-baby-pink: #FFD1DC;
+  --color-gelatico-peach-cream: #FFF5E1;
+  --color-gelatico-soft-blue: #B2E0F2;
+  --color-gelatico-light-yellow: #FFF9E5;
+  --font-gelatico: 'Playfair Display', serif;
+  --font-body: 'Poppins', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.font-gelatico {
+  font-family: var(--font-gelatico);
+}
+
+.font-gelatico-body {
+  font-family: var(--font-body);
+}
+
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    padding: 0 1.5rem;
+  }
+}
+
+.bg-gelatico-pink {
+  background-color: var(--color-gelatico-pink);
+}
+
+.bg-gelatico-baby-pink {
+  background-color: var(--color-gelatico-baby-pink);
+}
+
+.bg-gelatico-peach-cream {
+  background-color: var(--color-gelatico-peach-cream);
+}
+
+.bg-gelatico-light-yellow {
+  background-color: var(--color-gelatico-light-yellow);
+}
+
+.text-gelatico-pink {
+  color: var(--color-gelatico-pink);
+}
+
+/* Button styles */
+.gelatico-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-gelatico-pink);
+  color: white;
+  font-weight: 500;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.gelatico-button:hover {
+  background-color: rgba(255, 107, 149, 0.9);
+  transform: translateY(-2px);
+}
+
+.gelatico-button-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: var(--color-gelatico-pink);
+  font-weight: 500;
+  border: 1px solid var(--color-gelatico-pink);
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.gelatico-button-outline:hover {
+  background-color: rgba(255, 107, 149, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes pulse-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes rotate-slow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 4s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
